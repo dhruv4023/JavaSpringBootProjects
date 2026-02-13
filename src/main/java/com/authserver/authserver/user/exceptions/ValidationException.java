@@ -1,7 +1,11 @@
 package com.authserver.authserver.user.exceptions;
 
-public class ValidationException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+import com.authserver.authserver.base.exception.BaseApiException;
+
+public class ValidationException extends BaseApiException {
     public ValidationException(String message) {
-        super(message);
+        super(message, HttpStatus.BAD_REQUEST);
     }
 }

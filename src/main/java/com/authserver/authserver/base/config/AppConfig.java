@@ -17,10 +17,10 @@ public class AppConfig {
     @Bean
     public CommandLineRunner initializeRoles() {
         return args -> {
-            if (roleRepository.findByRoleName("admin") == null) {
+            if (roleRepository.findByRoleName("super_user") == null) {
                 RoleModel adminRole = new RoleModel();
-                adminRole.setRoleName("admin");
-                adminRole.setDescription("Administrator role with full access");
+                adminRole.setRoleName("super_user");
+                adminRole.setDescription("Super User role with full access");
                 roleRepository.save(adminRole);
             }
         };

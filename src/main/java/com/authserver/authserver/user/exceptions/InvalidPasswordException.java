@@ -1,8 +1,11 @@
 package com.authserver.authserver.user.exceptions;
 
-public
-class InvalidPasswordException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+import com.authserver.authserver.base.exception.BaseApiException;
+
+public class InvalidPasswordException extends BaseApiException {
     public InvalidPasswordException(String message) {
-        super(message);
+        super(message, HttpStatus.UNAUTHORIZED);
     }
 }
