@@ -15,6 +15,11 @@ import lombok.*;
 @ToString(callSuper = true)
 public class RoleModel extends BaseModel {
 
+    public RoleModel(String roleName, String description) {
+        this.roleName = roleName;
+        this.description = description;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

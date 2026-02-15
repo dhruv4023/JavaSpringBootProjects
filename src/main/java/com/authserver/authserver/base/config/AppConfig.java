@@ -1,13 +1,18 @@
 package com.authserver.authserver.base.config;
 
 import com.authserver.authserver.base.enums.RoleEnum;
+import com.authserver.authserver.user.models.AccessRights;
 import com.authserver.authserver.user.models.RoleModel;
+import com.authserver.authserver.user.repositories.AccessRightsRepository;
 import com.authserver.authserver.user.repositories.RoleRepository;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.method.HandlerMethod;
 
 @Configuration
 public class AppConfig {
@@ -15,15 +20,61 @@ public class AppConfig {
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private AccessRightsRepository accessRightsRepository;
+
+    @Autowired
+    private RequestMappingHandlerMapping handlerMapping;
+
+    private final List<String> excludeRoutes = List.of("/error", "/auth/signup", "/auth/login", "/auth/forgot-password",
+            "/");
+
+    private final List<String> adminExcludeRoutes = List.of("/role", "/user");
+
     @Bean
-    public CommandLineRunner initializeRoles() {
+    public CommandLineRunner initializeRolesAndAccessRights() {
         return args -> {
-            if (roleRepository.findByRoleName(RoleEnum.SUPER_USER.name()) == null) {
-                RoleModel adminRole = new RoleModel();
-                adminRole.setRoleName(RoleEnum.SUPER_USER.name());
-                adminRole.setDescription("Super User role with full access");
+            RoleModel adminRole = roleRepository.findByRoleName(RoleEnum.ADMIN.name());
+            if (adminRole == null) {
+                adminRole = new RoleModel(RoleEnum.ADMIN.name(), "Admin role with admin access");
                 roleRepository.save(adminRole);
             }
+
+            if (roleRepository.findByRoleName(RoleEnum.SUPER_USER.name()) == null) {
+                roleRepository.save(new RoleModel(RoleEnum.SUPER_USER.name(), "Super User role with full access"));
+                roleRepository.save(new RoleModel(RoleEnum.USER.name(), "User role with limited access"));
+            }
+
+            final RoleModel finalAdminRole = adminRole;
+
+            handlerMapping.getHandlerMethods().forEach((requestMappingInfo, handlerMethod) -> {
+                var patternsCondition = requestMappingInfo.getPathPatternsCondition();
+                if (patternsCondition != null) {
+                    patternsCondition.getPatternValues().forEach(url -> {
+                        if (excludeRoutes.contains(url)) {
+                            return;
+                        }
+                        String name = generateRightName(handlerMethod);
+                        String description = handlerMethod.toString();
+                        accessRightsRepository.findByName(name)
+                                .orElseGet(() -> {
+                                    AccessRights r = new AccessRights();
+                                    r.setName(name);
+                                    r.setDescription(description);
+                                    r.setRoute(url);
+                                    if (adminExcludeRoutes.stream().anyMatch(url::startsWith))
+                                        finalAdminRole.getAccessRights().add(r);
+                                    return accessRightsRepository.save(r);
+                                });
+                    });
+                }
+            });
         };
+    }
+
+    private String generateRightName(HandlerMethod handlerMethod) {
+        String controller = handlerMethod.getBeanType().getSimpleName().replace("Controller", "");
+        String method = handlerMethod.getMethod().getName();
+        return (controller + "_" + method).toUpperCase();
     }
 }

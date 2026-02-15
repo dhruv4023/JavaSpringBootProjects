@@ -1,8 +1,6 @@
 package com.authserver.authserver.user.manager;
 
 import java.util.Objects;
-
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import com.authserver.authserver.base.BaseManager;
 import com.authserver.authserver.user.entry.RoleEntry;
