@@ -1,11 +1,12 @@
 package com.authserver.authserver.user.manager.auth;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
+import com.authserver.authserver.base.enums.RoleEnum;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.RoleEntry;
@@ -21,7 +22,10 @@ import com.authserver.authserver.user.repositories.UserRepository;
 import com.authserver.authserver.user.response.AuthResponse;
 import com.authserver.authserver.user.security.JwtService;
 import jakarta.servlet.http.HttpSession;
+import lombok.Setter;
 
+@Setter(onMethod = @__({ @Autowired }))
+@Component
 public class AuthManager implements AuthManagerInterface {
 
     @Autowired
@@ -89,6 +93,13 @@ public class AuthManager implements AuthManagerInterface {
                     throw new UserAlreadyExistsException(
                             "User with username " + signupEntry.getUsername() + " already exists");
                 });
+
+        if (!userRepository.existsBy()) {
+            signupEntry.setRoleName(RoleEnum.SUPER_USER.name());
+        } else {
+            signupEntry.setRoleName(RoleEnum.USER.name());
+        }
+
         userRepository.save(convertToUserModel(signupEntry));
     }
 }

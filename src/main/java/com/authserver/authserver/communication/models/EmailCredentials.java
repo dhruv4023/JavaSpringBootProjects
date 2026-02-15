@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class EmailCredentials extends BaseModel {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)

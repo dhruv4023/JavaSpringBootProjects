@@ -34,7 +34,7 @@ public abstract class BaseController<ID, Entry, Service extends BaseService<ID, 
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<BaseResponse<Entry>> getAll(@RequestParam(defaultValue = "1") long page,
+    public ResponseEntity<BaseResponse<Entry>> getAll(@RequestParam(defaultValue = "0") long page,
             @RequestParam(defaultValue = "10") long size) {
         return service.getAll(page, size);
     }

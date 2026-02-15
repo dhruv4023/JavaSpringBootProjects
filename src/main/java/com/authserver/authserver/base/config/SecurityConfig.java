@@ -23,6 +23,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.authserver.authserver.user.security.AuthUserDetailsService;
+import com.authserver.authserver.user.security.DynamicAuthorizationFilter;
 import com.authserver.authserver.user.security.JwtFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,9 @@ public class SecurityConfig<S extends Session> {
 
     @Autowired
     private JwtFilter jwtFilter;
+
+    @Autowired
+    private DynamicAuthorizationFilter dynamicAuthorizationFilter;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -54,23 +58,23 @@ public class SecurityConfig<S extends Session> {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement -> sessionManagement
                         .maximumSessions(1)
                         .sessionRegistry(sessionRegistry()))
                 .httpBasic(Customizer.withDefaults())
-                .exceptionHandling(e -> e
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)) // Use custom entry point
-
                 .addFilterBefore((request, response, chain) -> {
                     HttpServletRequest httpRequest = (HttpServletRequest) request;
                     System.out.println(
                             "Requested URI: " + httpRequest.getRequestURI() + " Method: " + httpRequest.getMethod());
                     chain.doFilter(request, response);
                 }, UsernamePasswordAuthenticationFilter.class)
-                // JWT filter
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                // JWT filter                
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(dynamicAuthorizationFilter, JwtFilter.class)
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
 
         return http.build();
     }

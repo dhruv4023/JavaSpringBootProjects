@@ -1,8 +1,9 @@
 package com.authserver.authserver.user.models;
 
-import java.util.Set;
+import java.util.List;
 
 import com.authserver.authserver.base.BaseModel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,18 +14,20 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
-public class RoleModel extends BaseModel {
+public class AccessRights extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String roleName;
+    private String name;
 
     private String description;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "role_access_rights", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "access_rights_id"))
-    private Set<AccessRights> accessRights;
+    private String route;
+
+    @ManyToMany(mappedBy = "accessRights")
+    @JsonIgnore
+    private List<RoleModel> roles;
 }

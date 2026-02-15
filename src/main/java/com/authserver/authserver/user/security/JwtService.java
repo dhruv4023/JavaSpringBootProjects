@@ -52,11 +52,6 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        // return Jwts.parser()
-        // .setSigningKey(getSignKey())
-        // .build()
-        // .parseClaimsJws(token)
-        // .getBody();
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignKey())
@@ -68,6 +63,10 @@ public class JwtService {
     // Extract the username from the token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Long extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("id", Long.class));
     }
 
     // // Extract the expiration date from the token

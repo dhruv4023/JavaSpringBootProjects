@@ -6,24 +6,35 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.authserver.authserver.user.models.UserModel;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 public class AuthUserDetails implements UserDetails {
 
-    private String name;
+    private String username;
     private String password;
-    private GrantedAuthority authority;
+    private Collection<? extends GrantedAuthority> authorities;
 
-    public AuthUserDetails(UserModel userInfo) {
-        name = userInfo.getUsername();
-        password = userInfo.getPassword();
-        authority = new SimpleGrantedAuthority(userInfo.getRole().getRoleName());
+    public AuthUserDetails(UserModel user) {
+
+        this.username = user.getUsername();
+        this.password = user.getPassword();
+
+        List<GrantedAuthority> authRouteList = new ArrayList<>();
+
+        authRouteList.add(new SimpleGrantedAuthority(
+                "ROLE_" + user.getRole().getRoleName()));
+
+        user.getRole().getAccessRights().forEach(right -> authRouteList.add(
+                new SimpleGrantedAuthority(right.getRoute())));
+
+        this.authorities = authRouteList;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(authority);
+        return authorities;
     }
 
     @Override
@@ -33,7 +44,7 @@ public class AuthUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return name;
+        return username;
     }
 
     @Override
