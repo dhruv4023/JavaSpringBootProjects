@@ -12,6 +12,10 @@ import com.authserver.authserver.base.helper.PageResponse;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BaseResponse<T> {
+    public BaseResponse(boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
     private boolean success;
     private String message;
     private List<T> data;

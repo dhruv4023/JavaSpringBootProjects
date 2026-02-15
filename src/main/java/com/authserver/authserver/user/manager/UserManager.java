@@ -1,8 +1,6 @@
 package com.authserver.authserver.user.manager;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import com.authserver.authserver.base.BaseManager;
 import com.authserver.authserver.user.entry.UserEntry;
 import com.authserver.authserver.user.models.UserModel;
@@ -13,7 +11,7 @@ import lombok.Setter;
 
 @Setter(onMethod = @__({ @Autowired }))
 @Component
-public class UserManager extends BaseManager<UserModel, Long, UserEntry> {
+public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRepository> {
 
     protected UserManager(UserRepository repository) {
         super(repository, "user");

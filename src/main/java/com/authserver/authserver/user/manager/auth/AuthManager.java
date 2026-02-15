@@ -1,30 +1,28 @@
-package com.authserver.authserver.user.services.impl;
+package com.authserver.authserver.user.manager.auth;
 
-import com.authserver.authserver.base.helper.ResponseObject;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
+import com.authserver.authserver.user.entry.RoleEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
 import com.authserver.authserver.user.entry.UserEntry;
-import com.authserver.authserver.user.exceptions.*;
-import com.authserver.authserver.user.lang.En;
-import com.authserver.authserver.user.models.RoleModel;
+import com.authserver.authserver.user.exceptions.InvalidPasswordException;
+import com.authserver.authserver.user.exceptions.UserAlreadyExistsException;
+import com.authserver.authserver.user.exceptions.UserNotFoundException;
+import com.authserver.authserver.user.exceptions.ValidationException;
+import com.authserver.authserver.user.manager.RoleManager;
 import com.authserver.authserver.user.models.UserModel;
 import com.authserver.authserver.user.repositories.UserRepository;
 import com.authserver.authserver.user.response.AuthResponse;
 import com.authserver.authserver.user.security.JwtService;
-import com.authserver.authserver.user.services.AuthService;
-import com.authserver.authserver.user.services.RoleService;
-
 import jakarta.servlet.http.HttpSession;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Objects;
-
-@Service
-public class AuthServiceImpl implements AuthService {
+public class AuthManager implements AuthManagerInterface {
 
     @Autowired
     private JwtService jwtUtil;
@@ -33,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     private HttpSession session;
 
     @Autowired
-    private RoleService roleService;
+    private RoleManager roleManager;
 
     @Autowired
     private UserRepository userRepository;
@@ -41,13 +39,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseObject signup(SignupEntry signupEntry) {
-        userRepository.save(convertToUserModel(signupEntry));
-        return new ResponseObject(true, "User registered successfully", null);
-
-    }
-
-    public ResponseObject login(LoginEntry loginEntry) {
+    public AuthResponse login(LoginEntry loginEntry) {
         UserModel user = userRepository.findByUsername(loginEntry.getUsername())
                 .orElseThrow(() -> new UserNotFoundException(
                         "User with username " + loginEntry.getUsername() + " not found"));
@@ -56,14 +48,14 @@ public class AuthServiceImpl implements AuthService {
             String token = jwtUtil.generateToken(user.getId(), loginEntry.getUsername(),
                     user.getRole().getRoleName());
             session.setAttribute("user", loginEntry.getUsername());
-            return new ResponseObject(true, "Login successful", new AuthResponse(userEntry, token));
+            return new AuthResponse(userEntry, token);
         } else {
             throw new InvalidPasswordException("Invalid password for username " + loginEntry.getUsername());
         }
     }
 
     public UserModel convertToUserModel(SignupEntry signupEntry) {
-        RoleModel role = roleService.getRoleByName(signupEntry.getRoleName());
+        RoleEntry role = roleManager.getRoleByName(signupEntry.getRoleName());
         if (role == null) {
             throw new ValidationException("Role " + signupEntry.getRoleName() + " does not exist.");
         }
@@ -77,19 +69,26 @@ public class AuthServiceImpl implements AuthService {
         if (Objects.nonNull(signupEntry.getPassword())) {
             user.setPassword(passwordEncoder.encode(signupEntry.getPassword()));
         }
-        user.setRole(role);
-
+        user.setRole(role.toModel());
         return user;
     }
 
     @Override
-    public ResponseObject forgotPassword(ForgotPasswordEntry forgotPasswordEntry) {
+    public void forgotPassword(ForgotPasswordEntry forgotPasswordEntry) {
         UserModel user = userRepository.findByUsername(forgotPasswordEntry.getUsername())
                 .orElseThrow(() -> new UserNotFoundException(
                         "User with username " + forgotPasswordEntry.getUsername() + " not found"));
         user.setPassword(passwordEncoder.encode(forgotPasswordEntry.getNewPassword()));
         userRepository.save(user);
+    }
 
-        return new ResponseObject(false, En.FORGOT_PASSWORD_SUCCESS, null);
+    @Override
+    public void signup(SignupEntry signupEntry) {
+        userRepository.findByUsername(signupEntry.getUsername())
+                .ifPresent(u -> {
+                    throw new UserAlreadyExistsException(
+                            "User with username " + signupEntry.getUsername() + " already exists");
+                });
+        userRepository.save(convertToUserModel(signupEntry));
     }
 }

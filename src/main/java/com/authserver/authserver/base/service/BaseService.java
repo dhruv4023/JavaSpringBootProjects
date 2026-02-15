@@ -12,11 +12,12 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public abstract class BaseService<Entry, ID> implements BaseServiceInterface<Entry, ID> {
+public abstract class BaseService<ID, Entry, Manager extends BaseManager<ID, Entry, ?, ?>>
+        implements BaseServiceInterface<Entry, ID> {
 
-    private final BaseManager<?, ID, Entry> manager;
+    protected final Manager manager;
 
-    public BaseService(BaseManager<?, ID, Entry> manager) {
+    public BaseService(Manager manager) {
         this.manager = manager;
     }
 

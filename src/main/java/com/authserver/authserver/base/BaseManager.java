@@ -9,12 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
-public abstract class BaseManager<Entity, ID, Entry> {
+public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<Entity, ID>> {
 
-    private final JpaRepository<Entity, ID> repository;
+    protected final Repo repository;
     private final String entityName;
 
-    protected BaseManager(JpaRepository<Entity, ID> repository, String entityName) {
+    protected BaseManager(Repo repository, String entityName) {
         this.repository = repository;
         this.entityName = entityName;
     }
