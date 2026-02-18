@@ -16,9 +16,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EmailCredentials extends BaseModel {
 
-    @Id
-    private Long id;
-
     @Column(nullable = false)
     private String passcode;
 
