@@ -1,6 +1,7 @@
 package com.authserver.authserver.user.controllers;
+
 import com.authserver.authserver.base.response.BaseResponse;
-import com.authserver.authserver.user.entry.ForgotPasswordEntry;
+import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
 import com.authserver.authserver.user.response.AuthResponse;
@@ -9,6 +10,8 @@ import com.authserver.authserver.user.services.auth.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/auth")
@@ -30,7 +33,13 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<BaseResponse<Void>> forgotPassword(@RequestBody ForgotPasswordEntry forgotPasswordEntry) {
-        return ResponseEntity.ok(authService.forgotPassword(forgotPasswordEntry));
+    public ResponseEntity<BaseResponse<Void>> forgotPassword(@RequestBody String userName) {
+        return ResponseEntity.ok(authService.forgotPassword(userName));
     }
+
+    @PostMapping("/changer-password")
+    public ResponseEntity<BaseResponse<Void>> changerPassword(@RequestBody ChangePasswordEntry forgotPasswordEntry) {
+        return ResponseEntity.ok(authService.changePassword(forgotPasswordEntry));
+    }
+
 }
