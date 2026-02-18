@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.authserver.authserver.base.response.BaseResponse;
-import com.authserver.authserver.code_note.CodeNoteService;
 import com.authserver.authserver.code_note.entry.CodeNoteEntry;
+import com.authserver.authserver.code_note.service.CodeNoteService;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;

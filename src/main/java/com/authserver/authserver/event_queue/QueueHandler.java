@@ -177,7 +177,7 @@ public abstract class QueueHandler implements QueueHandlerInterface {
         queueRepo.save(event);
 
         if (LOCK.compareAndSet(false, true)) {
-            if (queueRepo.countByEventType(eventType()) >= 2) {
+            if (queueRepo.countByEventType(eventType()) >= 1) {
                 Thread t = new Thread(() -> {
                     try {
                         handle(10);
