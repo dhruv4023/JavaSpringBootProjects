@@ -1,11 +1,10 @@
 package com.authserver.authserver.user.manager;
 
-import java.util.Objects;
-
 import org.springframework.stereotype.Component;
 
 import com.authserver.authserver.base.BaseManager;
 import com.authserver.authserver.user.entry.RoleEntry;
+import com.authserver.authserver.user.mapper.RoleConvertor;
 import com.authserver.authserver.user.models.RoleModel;
 import com.authserver.authserver.user.repositories.RoleRepository;
 
@@ -16,28 +15,28 @@ import lombok.Setter;
 @Component
 public class RoleManager extends BaseManager<Long, RoleEntry, RoleModel, RoleRepository> {
 
-    protected RoleManager(RoleRepository repository) {
+    private final RoleConvertor roleConvertor;
+
+    protected RoleManager(RoleRepository repository, RoleConvertor roleConvertor) {
         super(repository, "role");
+        this.roleConvertor = roleConvertor;
     }
 
     @Override
     protected RoleModel toEntity(RoleEntry entry, RoleModel existing) throws EntityNotFoundException {
-        RoleModel role = existing != null ? existing : new RoleModel();
-        if (Objects.nonNull(entry.getRoleName())) {
-            role.setRoleName(entry.getRoleName());
-        }
-        if (Objects.nonNull(entry.getDescription())) {
-            role.setDescription(entry.getDescription());
-        }
-        return role;
+        return roleConvertor.toModel(entry, existing);
     }
 
     @Override
     protected RoleEntry toEntry(RoleModel entity) throws EntityNotFoundException {
-        return RoleEntry.fromModel(entity);
+        return roleConvertor.toEntry(entity);
     }
 
-    public RoleEntry getRoleByName(String roleName) {
-        return toEntry(repository.findByRoleName(roleName));
+    RoleEntry getRoleByName(String roleName) {
+        return toEntry(getRoleModelByName(roleName));
+    }
+
+    RoleModel getRoleModelByName(String roleName) {
+        return repository.findByRoleName(roleName);
     }
 }

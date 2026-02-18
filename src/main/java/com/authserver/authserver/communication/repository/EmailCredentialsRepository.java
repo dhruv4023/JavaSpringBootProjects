@@ -7,5 +7,5 @@ import com.authserver.authserver.communication.models.EmailCredentials;
 
 @Repository
 public interface EmailCredentialsRepository extends JpaRepository<EmailCredentials, Long>  {
-    
+
 }

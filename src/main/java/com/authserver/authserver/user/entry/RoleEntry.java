@@ -14,10 +14,6 @@ public class RoleEntry {
     private String roleName;
     private String description;
 
-    public static RoleEntry fromModel(RoleModel model) {
-        if (model == null) return null;
-        return new RoleEntry(model.getId(),model.getRoleName(), model.getDescription());
-    }
 
     public RoleModel toModel() {
         RoleModel model = new RoleModel();

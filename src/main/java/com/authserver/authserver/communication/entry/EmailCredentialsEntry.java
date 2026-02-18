@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmailCredentialsEntry {
-    private Long id;
     private String passcode;
-    private Long userId; 
+    private Long userId;
 }

@@ -4,7 +4,6 @@ import com.authserver.authserver.base.response.BaseResponse;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
-import com.authserver.authserver.user.lang.En;
 import com.authserver.authserver.user.manager.auth.AuthManager;
 import com.authserver.authserver.user.response.AuthResponse;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class AuthService implements AuthServiceInterface {
     @Override
     public BaseResponse<Void> forgotPassword(ForgotPasswordEntry forgotPasswordEntry) {
         authManager.forgotPassword(forgotPasswordEntry);
-        return new BaseResponse<>(true, En.FORGOT_PASSWORD_SUCCESS);
+        return new BaseResponse<>(true, "Password reset email sent successfully");
     }
 
 }
