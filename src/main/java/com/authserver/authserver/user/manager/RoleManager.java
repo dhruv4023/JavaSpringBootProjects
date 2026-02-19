@@ -32,7 +32,7 @@ public class RoleManager extends BaseManager<Long, RoleEntry, RoleModel, RoleRep
         return roleConvertor.toEntry(entity);
     }
 
-    RoleEntry getRoleByName(String roleName) {
+    public RoleEntry getRoleByName(String roleName) {
         return toEntry(getRoleModelByName(roleName));
     }
 

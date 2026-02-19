@@ -37,7 +37,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.forgotPassword(userName));
     }
 
-    @PostMapping("/changer-password")
+    @PostMapping("/change-password")
     public ResponseEntity<BaseResponse<Void>> changerPassword(@RequestBody ChangePasswordEntry forgotPasswordEntry) {
         return ResponseEntity.ok(authService.changePassword(forgotPasswordEntry));
     }

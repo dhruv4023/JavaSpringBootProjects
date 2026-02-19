@@ -18,11 +18,10 @@ import com.authserver.authserver.user.models.UserModel;
 import com.authserver.authserver.user.response.AuthResponse;
 import com.authserver.authserver.user.security.JwtService;
 import com.authserver.authserver.user.util.RandomPassword;
+import com.authserver.authserver.user.util.SecurityUtils;
 
 import jakarta.servlet.http.HttpSession;
-import lombok.Setter;
 
-@Setter(onMethod = @__({ @Autowired }))
 @Component
 public class AuthManager implements AuthManagerInterface {
 
@@ -39,6 +38,9 @@ public class AuthManager implements AuthManagerInterface {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SecurityUtils securityUtil;
 
     AuthManager(EmailService emailService) {
         this.emailService = emailService;
@@ -69,9 +71,10 @@ public class AuthManager implements AuthManagerInterface {
     }
 
     @Override
-    public void changePassword(ChangePasswordEntry forgotPasswordEntry) {
-        UserModel user = userManager.findUserModelByUsername(forgotPasswordEntry.getUsername());
-        user.setPassword(passwordEncoder.encode(forgotPasswordEntry.getNewPassword()));
+    public void changePassword(ChangePasswordEntry changePasswordEntry) {
+        String username = (String) securityUtil.getCurrentUsername();
+        UserModel user = userManager.findUserModelByUsername(username);
+        user.setPassword(passwordEncoder.encode(changePasswordEntry.getNewPassword()));
         userManager.save(user);
     }
 
@@ -80,9 +83,7 @@ public class AuthManager implements AuthManagerInterface {
     public void signup(SignupEntry signupEntry) {
 
         UserModel user = convertToUserModel(signupEntry);
-        String password = RandomPassword.generate(5);
-        user.setPassword(passwordEncoder.encode(password));
-        userManager.save(user);
+        String password = userManager.save(user);
 
         emailService.sendEmail(
                 user.getEmail(),

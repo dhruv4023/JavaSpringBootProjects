@@ -2,6 +2,8 @@ package com.authserver.authserver.user.security;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DynamicAuthorizationFilter extends OncePerRequestFilter {
 
+    private final List<String> excludeRoutes = List.of("/error", "/auth/signup", "/auth/login", "/auth/forgot-password",
+            "/");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
@@ -28,7 +33,13 @@ public class DynamicAuthorizationFilter extends OncePerRequestFilter {
 
         if (authentication != null && authentication.isAuthenticated()) {
 
-            String requestURI = request.getRequestURI();
+            String requestURI = request.getRequestURI().startsWith("/api") ? request.getRequestURI()
+                    .substring(4) : request.getRequestURI();
+
+            if (excludeRoutes.contains(requestURI)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 

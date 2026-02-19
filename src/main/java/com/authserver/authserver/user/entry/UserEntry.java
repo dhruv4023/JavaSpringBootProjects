@@ -19,6 +19,5 @@ public class UserEntry {
 
     private String email;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private RoleEntry roleEntry;
 }
