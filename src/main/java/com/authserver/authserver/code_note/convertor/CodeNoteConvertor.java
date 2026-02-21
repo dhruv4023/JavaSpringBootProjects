@@ -60,8 +60,9 @@ public class CodeNoteConvertor implements BaseConvertorInterface<CodeNoteEntry, 
                             .map(tag -> tagManager.addTag(tag))
                             .collect(Collectors.toSet()));
         }
-
-        model.setUser(userManager.findUserModelByUsername(securityUtils.getCurrentUsername()));
+        if (Objects.isNull(model.getUser())) {
+            model.setUser(userManager.findUserModelByUsername(securityUtils.getCurrentUsername()));
+        }
         return model;
     }
 
@@ -76,7 +77,7 @@ public class CodeNoteConvertor implements BaseConvertorInterface<CodeNoteEntry, 
                 model.getAiExplanation(),
                 model.getAiImprovements(),
                 model.getAiEmbeddingId(),
-                model.getAiTags().stream().map(tag-> tag.getName()).collect(Collectors.toSet()),
+                model.getAiTags().stream().map(tag -> tag.getName()).collect(Collectors.toSet()),
                 model.getUser().getId());
     }
 

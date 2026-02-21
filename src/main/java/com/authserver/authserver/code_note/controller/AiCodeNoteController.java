@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/ai-code-note")
+@RequestMapping("/ai/code-note")
 public class AiCodeNoteController {
 
     private final CodeNoteService codeNoteService;

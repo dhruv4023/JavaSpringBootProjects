@@ -1,6 +1,7 @@
 package com.authserver.authserver.code_note.managers;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.authserver.authserver.base.BaseManager;
 import com.authserver.authserver.code_note.InjestEvent;
@@ -32,6 +33,7 @@ public class CodeNoteManager extends BaseManager<Long, CodeNoteEntry, CodeNoteMo
     }
 
     @Override
+    @Transactional
     public CodeNoteEntry add(CodeNoteEntry entry) throws EntityNotFoundException {
         CodeNoteEntry note = super.add(entry);
         InjestEvent.triggerNoteCreatedEvent(note);
