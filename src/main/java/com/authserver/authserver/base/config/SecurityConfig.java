@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
+import com.authserver.authserver.ai.AiServiceAuthFilter;
 import com.authserver.authserver.user.security.AuthUserDetailsService;
 import com.authserver.authserver.user.security.DynamicAuthorizationFilter;
 import com.authserver.authserver.user.security.JwtFilter;
@@ -33,11 +33,17 @@ import jakarta.servlet.http.HttpServletRequest;
 @EnableMethodSecurity
 public class SecurityConfig<S extends Session> {
 
+    private final AiServiceAuthFilter aiServiceAuthFilter;
+
     @Autowired
     private JwtFilter jwtFilter;
 
     @Autowired
     private DynamicAuthorizationFilter dynamicAuthorizationFilter;
+
+    SecurityConfig(AiServiceAuthFilter aiServiceAuthFilter) {
+        this.aiServiceAuthFilter = aiServiceAuthFilter;
+    }
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -71,6 +77,7 @@ public class SecurityConfig<S extends Session> {
                     chain.doFilter(request, response);
                 }, UsernamePasswordAuthenticationFilter.class)
                 // JWT filter                
+                .addFilterBefore(aiServiceAuthFilter, JwtFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(dynamicAuthorizationFilter, JwtFilter.class)
                 .exceptionHandling(e -> e
