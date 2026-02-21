@@ -8,9 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import io.jsonwebtoken.Claims;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -36,12 +35,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String username = null;
         String jwtToken = null;
-        Long id = null;
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwtToken = authorizationHeader.substring(7);
             username = jwtService.extractUsername(jwtToken);
-            id = jwtService.extractUserId(jwtToken);
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -55,6 +52,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
-    }
 
+    }
 }

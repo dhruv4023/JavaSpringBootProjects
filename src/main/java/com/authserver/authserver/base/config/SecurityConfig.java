@@ -76,9 +76,9 @@ public class SecurityConfig<S extends Session> {
                             "Requested URI: " + httpRequest.getRequestURI() + " Method: " + httpRequest.getMethod());
                     chain.doFilter(request, response);
                 }, UsernamePasswordAuthenticationFilter.class)
-                // JWT filter                
-                .addFilterBefore(aiServiceAuthFilter, JwtFilter.class)
+                // JWT filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(aiServiceAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(dynamicAuthorizationFilter, JwtFilter.class)
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(customAuthenticationEntryPoint));

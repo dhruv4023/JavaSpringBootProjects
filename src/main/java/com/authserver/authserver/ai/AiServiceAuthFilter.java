@@ -3,6 +3,7 @@ package com.authserver.authserver.ai;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -10,7 +11,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 
 @Component
 public class AiServiceAuthFilter extends OncePerRequestFilter {
@@ -29,7 +29,10 @@ public class AiServiceAuthFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        if (!request.getRequestURI().startsWith("/ai/")) {
+        String requestURI = request.getRequestURI().startsWith("/api") ? request.getRequestURI()
+                .substring(4) : request.getRequestURI();
+
+        if (!requestURI.startsWith("/ai")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -89,8 +92,8 @@ public class AiServiceAuthFilter extends OncePerRequestFilter {
 
     private String hmacSha256(String data, String secret) throws Exception {
         javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
-        javax.crypto.spec.SecretKeySpec secretKey =
-                new javax.crypto.spec.SecretKeySpec(secret.getBytes(), "HmacSHA256");
+        javax.crypto.spec.SecretKeySpec secretKey = new javax.crypto.spec.SecretKeySpec(secret.getBytes(),
+                "HmacSHA256");
 
         mac.init(secretKey);
         byte[] hash = mac.doFinal(data.getBytes());

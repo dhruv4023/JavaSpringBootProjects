@@ -24,7 +24,7 @@ public class AppInitializationService extends AbstractStartupInitializer {
     private final RequestMappingHandlerMapping handlerMapping;
 
     private final List<String> excludeRoutes = List.of(
-            "/error", "/auth/signup", "/auth/login", "/auth/forgot-password", "/");
+            "/error", "/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai");
 
     private final List<String> adminExcludeRoutes = List.of("/role", "/user");
 

@@ -3,7 +3,9 @@ package com.authserver.authserver.user.security;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
+import org.springframework.core.Ordered;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +17,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.AntPathMatcher;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class DynamicAuthorizationFilter extends OncePerRequestFilter {
 
     private final List<String> excludeRoutes = List.of("/error", "/auth/signup", "/auth/login", "/auth/forgot-password",
             "/");
+    AntPathMatcher matcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -48,7 +52,9 @@ public class DynamicAuthorizationFilter extends OncePerRequestFilter {
                         if (auth.getAuthority().equals("ROLE_SUPER_USER")) {
                             return true;
                         }
-                        return auth.getAuthority().equals(requestURI);
+                        Objects.requireNonNull(requestURI);
+                        Objects.requireNonNull(auth.getAuthority());
+                        return matcher.match(auth.getAuthority(), requestURI);
                     });
 
             if (!allowed) {
