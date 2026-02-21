@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.core.Ordered;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,14 +22,14 @@ import org.springframework.util.AntPathMatcher;
 @RequiredArgsConstructor
 public class DynamicAuthorizationFilter extends OncePerRequestFilter {
 
-    private final List<String> excludeRoutes = List.of("/error", "/auth/signup", "/auth/login", "/auth/forgot-password",
+    private final List<String> excludeRoutes = List.of("/error", "/auth/signup", "/auth/login", "/auth/forgot-password", "/ai",
             "/");
     AntPathMatcher matcher = new AntPathMatcher();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
+    protected void doFilterInternal(@SuppressWarnings("null") HttpServletRequest request,
+            @SuppressWarnings("null") HttpServletResponse response,
+            @SuppressWarnings("null") FilterChain filterChain)
             throws ServletException, IOException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -47,6 +46,7 @@ public class DynamicAuthorizationFilter extends OncePerRequestFilter {
 
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
+            @SuppressWarnings("null")
             boolean allowed = authorities.stream()
                     .anyMatch(auth -> {
                         if (auth.getAuthority().equals("ROLE_SUPER_USER")) {

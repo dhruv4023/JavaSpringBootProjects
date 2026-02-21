@@ -1,6 +1,5 @@
 package com.authserver.authserver.user.manager;
 
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.authserver.authserver.base.BaseManager;

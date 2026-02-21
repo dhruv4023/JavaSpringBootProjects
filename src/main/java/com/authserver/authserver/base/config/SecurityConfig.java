@@ -21,7 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import com.authserver.authserver.ai.AiServiceAuthFilter;
+
+import com.authserver.authserver.base.ai.AiServiceAuthFilter;
 import com.authserver.authserver.user.security.AuthUserDetailsService;
 import com.authserver.authserver.user.security.DynamicAuthorizationFilter;
 import com.authserver.authserver.user.security.JwtFilter;
@@ -64,12 +65,11 @@ public class SecurityConfig<S extends Session> {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement -> sessionManagement
                         .maximumSessions(1)
                         .sessionRegistry(sessionRegistry()))
-                .httpBasic(Customizer.withDefaults())
                 .addFilterBefore((request, response, chain) -> {
                     HttpServletRequest httpRequest = (HttpServletRequest) request;
                     System.out.println(
@@ -99,7 +99,8 @@ public class SecurityConfig<S extends Session> {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:8080"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Time-Zone"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Time-Zone", "X-AI-Service-Key",
+                "X-AI-Signature", "X-Request-Time"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
