@@ -12,6 +12,8 @@ import java.util.List;
 
 public class AuthUserDetails implements UserDetails {
 
+    private Long userId;
+
     private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
@@ -20,6 +22,7 @@ public class AuthUserDetails implements UserDetails {
 
         this.username = user.getUsername();
         this.password = user.getPassword();
+        this.userId = user.getId();
 
         List<GrantedAuthority> authRouteList = new ArrayList<>();
 
@@ -40,6 +43,10 @@ public class AuthUserDetails implements UserDetails {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     @Override

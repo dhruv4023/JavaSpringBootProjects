@@ -10,7 +10,6 @@ import com.authserver.authserver.user.repositories.RoleRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.util.List;
@@ -53,7 +52,7 @@ public class AppInitializationService extends AbstractStartupInitializer {
                     if (excludeRoutes.contains(url))
                         return;
 
-                    String name = generateRightName(handlerMethod);
+                    String name = generateRightName(url);
                     String description = handlerMethod.toString();
 
                     accessRightsRepository.findByName(name)
@@ -74,12 +73,13 @@ public class AppInitializationService extends AbstractStartupInitializer {
         });
     }
 
-    private String generateRightName(HandlerMethod handlerMethod) {
-        String controller = handlerMethod.getBeanType()
-                .getSimpleName()
-                .replace("Controller", "");
-        String method = handlerMethod.getMethod().getName();
-        return (controller + "_" + method).toUpperCase();
+    private String generateRightName(String url) {
+        return url
+                .replace('/', '_')
+                .replace('-', '_')
+                .replace('{', '_')
+                .replace('}', '_')
+                .toUpperCase();
     }
 
 }

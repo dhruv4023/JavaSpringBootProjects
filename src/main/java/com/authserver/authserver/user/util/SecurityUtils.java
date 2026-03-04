@@ -4,12 +4,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.authserver.authserver.user.security.AuthUserDetails;
+
 @Component
 public class SecurityUtils {
 
     public String getCurrentUsername() {
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             return null;
@@ -17,5 +18,18 @@ public class SecurityUtils {
 
         return authentication.getName();
     }
-}
 
+    public Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+                if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        AuthUserDetails userDetails = (AuthUserDetails) authentication.getPrincipal();
+
+        return userDetails.getUserId();
+    }
+}
