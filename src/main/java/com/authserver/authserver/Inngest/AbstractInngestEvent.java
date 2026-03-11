@@ -5,15 +5,16 @@ import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public abstract class AbstractInngestEvent {
+public abstract class AbstractInngestEvent<T> {
 
     private static final String INNGEST_URL = "http://127.0.0.1:8288/e/dev_key";
     private static final RestTemplate restTemplate = new RestTemplate();
 
-    protected static void sendEvent(String eventName, Map<String, Object> data) {
+    protected void sendEvent(String eventName, List<T> data) {
 
         Map<String, Object> event = new HashMap<>();
         event.put("name", eventName);
