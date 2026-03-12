@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @Builder
-class EventQueueEntry {
+public class EventQueueEntry {
 
     private final Long id;
     private final String eventType;
@@ -15,11 +15,20 @@ class EventQueueEntry {
     private String error;
 
     @Setter
-    private String sender;
+    private Long senderId;
 
     @Setter
     private String payload;
 
     @Setter
     private Integer retryCount;
+
+    public EventQueueEntry(Long senderId, String payload, Integer retryCount) {
+        this.id = null;
+        this.eventType = null;
+        this.status = null;
+        this.senderId = senderId;
+        this.payload = payload;
+        this.retryCount = retryCount;
+    }
 }

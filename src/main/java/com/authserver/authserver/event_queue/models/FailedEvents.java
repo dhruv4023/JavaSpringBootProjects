@@ -29,7 +29,8 @@ public class FailedEvents extends BaseModel {
     @Column(name = "status", nullable = false)
     private QueueStatus status;
 
-    @Column(name = "sender")
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
     private UserModel sender;
 
     @Column(name = "error")

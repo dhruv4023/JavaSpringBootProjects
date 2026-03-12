@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -59,8 +60,14 @@ public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<
     }
 
     public Page<Entry> get(long page, long size) {
-        Pageable pageable = PageRequest.of((int) page, (int) size);
+        Sort sort = getSort();
+        Objects.requireNonNull(sort, "Sort must not be null");
+        Pageable pageable = PageRequest.of((int) page, (int) size, sort);
         Page<Entity> entityPage = repository.findAll(pageable);
         return entityPage.map(this::toEntry);
+    }
+
+    protected Sort getSort() {
+        return Sort.by("id").descending();
     }
 }

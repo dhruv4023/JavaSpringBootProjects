@@ -50,6 +50,10 @@ public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRep
         return repository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
+    public UserModel findUserModelByID(Long userId) {
+        return repository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
     public String save(UserModel user) {
         if (repository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException("Email already exists");

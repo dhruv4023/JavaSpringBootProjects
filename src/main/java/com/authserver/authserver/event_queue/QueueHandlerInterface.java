@@ -5,4 +5,8 @@ public interface QueueHandlerInterface {
     String eventType();
 
     void handle(Integer maxAtATime);
+
+    boolean limitOnePerSender();
+
+    boolean addToQueue(EventQueueEntry entry);
 }

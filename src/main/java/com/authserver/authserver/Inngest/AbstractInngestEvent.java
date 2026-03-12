@@ -17,16 +17,17 @@ public abstract class AbstractInngestEvent<T> {
     protected void sendEvent(String eventName, List<T> data) {
 
         Map<String, Object> event = new HashMap<>();
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("items", data);
         event.put("name", eventName);
-        event.put("data", data);
+        event.put("data", payload);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(event, headers);
 
-        ResponseEntity<String> response =
-                restTemplate.postForEntity(INNGEST_URL, request, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(INNGEST_URL, request, String.class);
 
         if (!response.getStatusCode().is2xxSuccessful()) {
             log.error("Failed to send event: {}", eventName);
