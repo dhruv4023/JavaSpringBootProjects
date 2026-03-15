@@ -38,8 +38,8 @@ public class AuthService implements AuthServiceInterface {
     }
 
     @Override
-    public BaseResponse<Void> changePassword(ChangePasswordEntry forgotPasswordEntry) {
-        authManager.changePassword(forgotPasswordEntry);
+    public BaseResponse<Void> changePassword(ChangePasswordEntry changePasswordEntry) {
+        authManager.changePassword(changePasswordEntry);
         return new BaseResponse<>(true, "Password changed successfully");
     }
 

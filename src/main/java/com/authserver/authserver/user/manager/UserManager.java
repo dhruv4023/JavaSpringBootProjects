@@ -1,5 +1,7 @@
 package com.authserver.authserver.user.manager;
 
+import java.util.Objects;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.authserver.authserver.base.BaseManager;
@@ -50,7 +52,13 @@ public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRep
         return repository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
+    public UserModel update(UserModel userModel) {
+        Objects.requireNonNull(userModel, "User data cannot be null");
+        return repository.save(userModel);
+    }
+
     public UserModel findUserModelByID(Long userId) {
+        Objects.requireNonNull(userId, "User id cannot be null");
         return repository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 

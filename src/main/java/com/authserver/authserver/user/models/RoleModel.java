@@ -1,5 +1,6 @@
 package com.authserver.authserver.user.models;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.authserver.authserver.base.BaseModel;
@@ -27,5 +28,5 @@ public class RoleModel extends BaseModel {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "role_access_rights", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "access_rights_id"))
-    private Set<AccessRights> accessRights;
+    private Set<AccessRights> accessRights = new HashSet<>();
 }

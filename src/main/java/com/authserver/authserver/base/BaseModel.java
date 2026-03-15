@@ -8,6 +8,7 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
@@ -15,6 +16,7 @@ import java.time.Instant;
 @MappedSuperclass
 @Getter
 @Setter
+@NoArgsConstructor
 public abstract class BaseModel {
 
     @Id
@@ -26,6 +28,10 @@ public abstract class BaseModel {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    public BaseModel(Long id) {
+        this.id = id;
+    }
 
     @PrePersist
     protected void onCreate() {

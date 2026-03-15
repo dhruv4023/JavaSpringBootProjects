@@ -29,8 +29,13 @@ public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<
         Objects.requireNonNull(entry, "Entry must not be null");
         Entity entity = toEntity(entry, null);
         Objects.requireNonNull(entity, "Entity must not be null");
+        validateAddEntry(entity);
         Entity saved = repository.save(entity);
         return toEntry(saved);
+    }
+
+    protected Boolean validateAddEntry(Entity entry) {
+        return true;
     }
 
     public Entry update(ID id, Entry entry) throws EntityNotFoundException {
@@ -38,11 +43,15 @@ public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<
 
         Entity existing = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(entityName + " not found"));
-
+        validateUpdateEntry(entry, toEntry(existing));
         Entity updated = toEntity(entry, existing);
         Objects.requireNonNull(updated, "Updated entity must not be null");
         Entity saved = repository.save(updated);
         return toEntry(saved);
+    }
+
+    protected Boolean validateUpdateEntry(Entry newEntity, Entry existing) {
+        return true;
     }
 
     public void delete(ID id) throws EntityNotFoundException {

@@ -75,7 +75,7 @@ public class AuthManager implements AuthManagerInterface {
         String username = (String) securityUtil.getCurrentUsername();
         UserModel user = userManager.findUserModelByUsername(username);
         user.setPassword(passwordEncoder.encode(changePasswordEntry.getNewPassword()));
-        userManager.save(user);
+        userManager.update(user);
     }
 
     @Override

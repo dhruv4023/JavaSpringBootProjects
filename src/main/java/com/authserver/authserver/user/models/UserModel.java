@@ -12,6 +12,9 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 public class UserModel extends BaseModel {
+    public UserModel(Long id) {
+        super(id);
+    }
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -25,4 +28,5 @@ public class UserModel extends BaseModel {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private RoleModel role;
+
 }
