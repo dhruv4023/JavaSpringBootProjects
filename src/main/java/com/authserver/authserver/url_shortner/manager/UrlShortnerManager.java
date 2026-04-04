@@ -7,8 +7,12 @@ import com.authserver.authserver.url_shortner.util.UriUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
+import java.util.Set;
+
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.authserver.authserver.url_shortner.entry.UrlShortnerEntry;
@@ -22,8 +26,7 @@ public class UrlShortnerManager {
     private final UrlShortnerRepository repository;
     private final UriUtils utils;
 
-
-    public UrlShortnerManager( UriUtils utils,
+    public UrlShortnerManager(UriUtils utils,
             UrlShortnerRepository repository, RedisCacheService redisCacheService) {
         this.repository = repository;
         this.redisCacheService = redisCacheService;
@@ -64,9 +67,14 @@ public class UrlShortnerManager {
     }
 
     public String get(String shortCode) {
-        String url = redisCacheService.get(shortCode, String.class);
+
+        String urlKey = "url:" + shortCode;
+        String clickKey = "click:" + shortCode;
+
+        String url = redisCacheService.get(urlKey, String.class);
         if (url != null) {
-            redisCacheService.set(shortCode, url, Duration.ofHours(24));
+            redisCacheService.addToSet("dirty:clicks", shortCode);
+            redisCacheService.increment(clickKey);
             return url;
         }
 
@@ -79,11 +87,11 @@ public class UrlShortnerManager {
         }
 
         url = model.getOriginalUrl();
-        redisCacheService.set(shortCode, url, Duration.ofHours(24));
-        model.setClickCount(model.getClickCount() + 1);
-        repository.save(model);
 
-        return model.getOriginalUrl();
+        redisCacheService.set(urlKey, url, Duration.ofHours(24));
+        redisCacheService.increment(clickKey);
+        redisCacheService.addToSet("dirty:clicks", shortCode);
+        return url;
     }
 
     public String generateUniqueShortCode() {
@@ -96,4 +104,17 @@ public class UrlShortnerManager {
         return code;
     }
 
+    @Transactional
+    @Scheduled(fixedRate = 60 * 1000) // 1 min
+    public void syncClickCounts() {
+        Set<String> dirtyKeys = redisCacheService.getSetMembers("dirty:clicks");
+        log.info("sync lcick");
+        for (String shortCode : dirtyKeys) {
+            Long count = redisCacheService.get("click:" + shortCode, Long.class);
+
+            repository.updateClickCount(shortCode, count);
+
+            redisCacheService.removeFromSet("dirty:clicks", shortCode);
+        }
+    }
 }
