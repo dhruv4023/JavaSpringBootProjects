@@ -1,7 +1,6 @@
 package com.authserver.authserver.redis;
 
 import java.time.Duration;
-import java.util.Set;
 
 public interface CacheService {
 
@@ -16,10 +15,4 @@ public interface CacheService {
     boolean exists(String key);
 
     Long increment(String key);
-
-    void addToSet(String key, String value);
-
-    Set<String> getSetMembers(String key);
-
-    void removeFromSet(String key, String value);
 }

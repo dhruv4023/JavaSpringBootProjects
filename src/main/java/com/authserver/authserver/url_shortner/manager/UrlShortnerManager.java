@@ -1,9 +1,13 @@
 package com.authserver.authserver.url_shortner.manager;
 
+import com.authserver.authserver.redis.RedisCacheService;
 import com.authserver.authserver.url_shortner.repository.UrlShortnerRepository;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
@@ -16,13 +20,16 @@ import com.authserver.authserver.url_shortner.entry.UrlShortnerEntry;
 import com.authserver.authserver.url_shortner.model.UrlShortner;
 
 @Component
+@Slf4j
 public class UrlShortnerManager {
 
+    private final RedisCacheService redisCacheService;
     private final UrlShortnerRepository repository;
 
     public UrlShortnerManager(
-            UrlShortnerRepository repository) {
+            UrlShortnerRepository repository, RedisCacheService redisCacheService) {
         this.repository = repository;
+        this.redisCacheService = redisCacheService;
     }
 
     public String add(UrlShortnerEntry entry) {
@@ -38,6 +45,7 @@ public class UrlShortnerManager {
 
         try {
             UrlShortner saved = repository.save(model);
+            redisCacheService.set(saved.getShortCode(), normalizedUrl, Duration.ofHours(24));
             return buildShortUrl(saved.getShortCode());
 
         } catch (DataIntegrityViolationException ex) {
@@ -58,6 +66,12 @@ public class UrlShortnerManager {
     }
 
     public String get(String shortCode) {
+        String url = redisCacheService.get(shortCode, String.class);
+        if (url != null) {
+            redisCacheService.set(shortCode, url, Duration.ofHours(24));
+            return url;
+        }
+
         UrlShortner model = repository.findByShortCode(shortCode)
                 .orElseThrow(() -> new RuntimeException("Short URL not found"));
 
@@ -66,6 +80,8 @@ public class UrlShortnerManager {
             throw new RuntimeException("Short URL expired");
         }
 
+        url = model.getOriginalUrl();
+        redisCacheService.set(shortCode, url, Duration.ofHours(24));
         model.setClickCount(model.getClickCount() + 1);
         repository.save(model);
 
