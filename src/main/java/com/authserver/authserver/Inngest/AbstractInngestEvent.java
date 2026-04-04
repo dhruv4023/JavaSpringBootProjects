@@ -1,6 +1,8 @@
 package com.authserver.authserver.Inngest;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -11,7 +13,9 @@ import java.util.Map;
 @Slf4j
 public abstract class AbstractInngestEvent<T> {
 
-    private static final String INNGEST_URL = "http://127.0.0.1:8288/e/dev_key";
+    @Value("${inngest.service.url}")
+    private String INNGEST_URL;
+    
     private static final RestTemplate restTemplate = new RestTemplate();
 
     protected void sendEvent(String eventName, List<T> data) {

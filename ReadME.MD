@@ -6,9 +6,8 @@ This project sets up a Spring Boot application with JWT token-based authenticati
 
 ### Prerequisites
 
-- Java 18.0.2.1 (or compatible version)
+- Java 17
 - Maven 3.x
-- An IDE like IntelliJ IDEA or Eclipse (optional)
 
 ### Setup Environment
 

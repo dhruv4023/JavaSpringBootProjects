@@ -9,6 +9,7 @@ import com.authserver.authserver.base.helper.PageResponse;
 import com.authserver.authserver.base.response.BaseResponse;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -22,21 +23,24 @@ public abstract class BaseService<ID, Entry, Manager extends BaseManager<ID, Ent
     }
 
     protected ResponseEntity<BaseResponse<Entry>> handleServiceOperation(
-            Supplier<Entry> operation,
+            Supplier<List<Entry>> operation,
             String successMessage,
-            HttpStatus successStatus) {
+            HttpStatus successStatus,
+            PageResponse pageResponse) {
 
-        Entry result = operation.get();
+        List<Entry> result = operation.get();
         return ResponseEntity.status(Objects.nonNull(successStatus) ? successStatus : HttpStatus.OK).body(
-                new BaseResponse<>(true, successMessage, Collections.singletonList(result), null));
-    }
+                new BaseResponse<>(true, successMessage, (result), pageResponse));
+    }    
 
     public ResponseEntity<BaseResponse<Entry>> add(Entry entry) {
-        return handleServiceOperation(() -> manager.add(entry), "Added successfully", HttpStatus.CREATED);
+        return handleServiceOperation(() -> Collections.singletonList(manager.add(entry)), "Added successfully",
+                HttpStatus.CREATED, null);
     }
 
     public ResponseEntity<BaseResponse<Entry>> update(ID id, Entry entry) {
-        return handleServiceOperation(() -> manager.update(id, entry), "Updated successfully", null);
+        return handleServiceOperation(() -> Collections.singletonList(manager.update(id, entry)),
+                "Updated successfully", null, null);
     }
 
     public ResponseEntity<Void> delete(ID id) {
@@ -45,12 +49,13 @@ public abstract class BaseService<ID, Entry, Manager extends BaseManager<ID, Ent
     }
 
     public ResponseEntity<BaseResponse<Entry>> get(ID id) {
-        return handleServiceOperation(() -> manager.getById(id), "Fetched successfully", null);
+        return handleServiceOperation(() -> Collections.singletonList(manager.getById(id)), "Fetched successfully",
+                null, null);
     }
 
     public ResponseEntity<BaseResponse<Entry>> getAll(long page, long size) {
         Page<Entry> result = manager.get(page, size);
         PageResponse pageResponse = new PageResponse(page, size, result.getTotalElements());
-        return ResponseEntity.ok(new BaseResponse<>(true, "Fetched successfully", result.getContent(), pageResponse));
+        return handleServiceOperation(()-> result.getContent(), "Fetched successfully", null, pageResponse);
     }
 }

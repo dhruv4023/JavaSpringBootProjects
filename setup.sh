@@ -41,12 +41,14 @@ echo ""
 # -------------------------------
 mkdir -p .vscode
 
+JAVA_VERSION=$(java -version 2>&1 | awk -F[\".] '/version/ {print $2}')
+
 cat > .vscode/settings.json <<EOF
 {
   "java.jdt.ls.java.home": "$JAVA_HOME",
   "java.configuration.runtimes": [
     {
-      "name": "JavaSE-$(java -version 2>&1 | awk -F[\".] '/version/ {print \$2}')",
+      "name": "JavaSE-$JAVA_VERSION",
       "path": "$JAVA_HOME",
       "default": true
     }
