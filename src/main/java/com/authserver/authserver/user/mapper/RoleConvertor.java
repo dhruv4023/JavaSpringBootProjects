@@ -4,12 +4,12 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Component;
 
-import com.authserver.authserver.base.BaseConvertorInterface;
+import com.authserver.authserver.base.ConvertorInterface;
 import com.authserver.authserver.user.entry.RoleEntry;
 import com.authserver.authserver.user.models.RoleModel;
 
 @Component
-public class RoleConvertor implements BaseConvertorInterface<RoleEntry, RoleModel>{
+public class RoleConvertor implements ConvertorInterface<RoleEntry, RoleModel>{
     
     @Override
     public RoleModel toModel(RoleEntry entry, RoleModel existing) {

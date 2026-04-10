@@ -3,12 +3,12 @@ package com.authserver.authserver.user.mapper;
 import java.util.Objects;
 import org.springframework.stereotype.Component;
 
-import com.authserver.authserver.base.BaseConvertorInterface;
+import com.authserver.authserver.base.ConvertorInterface;
 import com.authserver.authserver.user.entry.UserEntry;
 import com.authserver.authserver.user.models.UserModel;
 
 @Component
-public class UserConvertor implements BaseConvertorInterface<UserEntry, UserModel> {
+public class UserConvertor implements ConvertorInterface<UserEntry, UserModel> {
 
     private final RoleConvertor roleConvertor;
 

@@ -4,7 +4,7 @@ import com.authserver.authserver.base.response.BaseResponse;
 import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
-import com.authserver.authserver.user.manager.auth.AuthManager;
+import com.authserver.authserver.user.manager.auth.AuthManagerInterface;
 import com.authserver.authserver.user.response.AuthResponse;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +13,9 @@ import java.util.Collections;
 @Service
 public class AuthService implements AuthServiceInterface {
 
-    AuthManager authManager;
+    AuthManagerInterface authManager;
 
-    public AuthService(AuthManager authManager) {
+    public AuthService(AuthManagerInterface authManager) {
         this.authManager = authManager;
     }
 

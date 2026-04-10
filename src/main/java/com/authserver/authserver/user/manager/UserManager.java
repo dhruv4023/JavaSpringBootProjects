@@ -4,11 +4,12 @@ import java.util.Objects;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import com.authserver.authserver.base.ConvertorInterface;
 import com.authserver.authserver.base.BaseManager;
 import com.authserver.authserver.base.enums.RoleEnum;
 import com.authserver.authserver.user.entry.UserEntry;
 import com.authserver.authserver.user.exceptions.UserAlreadyExistsException;
-import com.authserver.authserver.user.mapper.UserConvertor;
 import com.authserver.authserver.user.models.RoleModel;
 import com.authserver.authserver.user.models.UserModel;
 import com.authserver.authserver.user.repositories.RoleRepository;
@@ -24,9 +25,9 @@ public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRep
 
     private final RoleRepository roleRepository;
 
-    private final UserConvertor userConvertor;
+    private final ConvertorInterface<UserEntry, UserModel> userConvertor;
 
-    UserManager(UserRepository repository, UserConvertor userConvertor,
+    UserManager(UserRepository repository, ConvertorInterface<UserEntry, UserModel> userConvertor,
             RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         super(repository, "user");
         this.userConvertor = userConvertor;

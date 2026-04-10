@@ -3,8 +3,8 @@ package com.authserver.authserver.user.manager;
 import org.springframework.stereotype.Component;
 
 import com.authserver.authserver.base.BaseManager;
+import com.authserver.authserver.base.ConvertorInterface;
 import com.authserver.authserver.user.entry.RoleEntry;
-import com.authserver.authserver.user.mapper.RoleConvertor;
 import com.authserver.authserver.user.models.RoleModel;
 import com.authserver.authserver.user.repositories.RoleRepository;
 
@@ -15,9 +15,9 @@ import lombok.Setter;
 @Component
 public class RoleManager extends BaseManager<Long, RoleEntry, RoleModel, RoleRepository> {
 
-    private final RoleConvertor roleConvertor;
+    private final ConvertorInterface<RoleEntry, RoleModel> roleConvertor;
 
-    protected RoleManager(RoleRepository repository, RoleConvertor roleConvertor) {
+    protected RoleManager(RoleRepository repository, ConvertorInterface<RoleEntry, RoleModel> roleConvertor) {
         super(repository, "role");
         this.roleConvertor = roleConvertor;
     }
