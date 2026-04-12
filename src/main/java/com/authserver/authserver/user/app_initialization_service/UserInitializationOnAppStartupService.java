@@ -16,7 +16,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class AppInitializationService extends AbstractStartupInitializer {
+public class UserInitializationOnAppStartupService extends AbstractStartupInitializer {
 
     private final RoleRepository roleRepository;
     private final AccessRightsRepository accessRightsRepository;

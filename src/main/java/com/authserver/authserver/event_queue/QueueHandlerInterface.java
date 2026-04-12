@@ -9,4 +9,9 @@ public interface QueueHandlerInterface {
     boolean limitOnePerSender();
 
     boolean addToQueue(EventQueueEntry entry);
+
+    int maxRetryCount();
+
+    Integer handlMaxAtaTime();
+    Integer nextRetryAfterXMinutes();
 }

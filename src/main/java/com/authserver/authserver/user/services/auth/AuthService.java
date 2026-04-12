@@ -2,6 +2,7 @@ package com.authserver.authserver.user.services.auth;
 
 import com.authserver.authserver.base.response.BaseResponse;
 import com.authserver.authserver.user.entry.ChangePasswordEntry;
+import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
 import com.authserver.authserver.user.manager.auth.AuthManagerInterface;
@@ -32,9 +33,9 @@ public class AuthService implements AuthServiceInterface {
     }
 
     @Override
-    public BaseResponse<Void> forgotPassword(String userName) {
-        authManager.forgotPassword(userName);
-        return new BaseResponse<>(true, "Password reset email sent successfully");
+    public BaseResponse<Void> forgotPassword(ForgotPasswordEntry forgotPasswordEntry) {
+        authManager.forgotPassword(forgotPasswordEntry);
+        return new BaseResponse<>(true, "We received your request to reset your password. Please check your email in few minutes.");
     }
 
     @Override

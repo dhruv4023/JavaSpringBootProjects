@@ -2,6 +2,9 @@ package com.authserver.authserver.event_queue.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.Instant;
+
 import com.authserver.authserver.base.BaseModel;
 import com.authserver.authserver.event_queue.QueueStatus;
 import com.authserver.authserver.user.models.UserModel;
@@ -38,6 +41,9 @@ public class EventQueue extends BaseModel {
 
     @Column(name = "retry_count")
     private Integer retryCount;
+
+    @Column(name = "next_retry_after")
+    private Instant nextRetryAfter;
 
     @PrePersist
     public void prePersist() {

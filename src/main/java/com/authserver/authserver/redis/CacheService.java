@@ -16,6 +16,8 @@ public interface CacheService {
     boolean exists(String key);
 
     Long increment(String key);
+    
+    Long decrement(String key);
 
     void addToSet(String key, String value);
 

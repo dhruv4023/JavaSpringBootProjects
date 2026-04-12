@@ -10,6 +10,7 @@ public class EventQueueEntry {
     private final Long id;
     private final String eventType;
     private final QueueStatus status;
+    private final Integer retryCount;
 
     @Setter
     private String error;
@@ -20,15 +21,12 @@ public class EventQueueEntry {
     @Setter
     private String payload;
 
-    @Setter
-    private Integer retryCount;
-
-    public EventQueueEntry(Long senderId, String payload, Integer retryCount) {
+    public EventQueueEntry(Long senderId, String payload) {
         this.id = null;
         this.eventType = null;
         this.status = null;
+        this.retryCount = null;
         this.senderId = senderId;
         this.payload = payload;
-        this.retryCount = retryCount;
     }
 }

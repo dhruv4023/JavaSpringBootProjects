@@ -40,6 +40,16 @@ public class RedisCacheService implements CacheService {
         return objectMapper.convertValue(value, clazz);
     }
 
+    public <T> T getOrDefault(String key, Class<T> clazz, T defaultValue) {
+        Object value = redisTemplate.opsForValue().get(key);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return objectMapper.convertValue(value, clazz);
+    }
+
     @Override
     public void delete(String key) {
         redisTemplate.delete(key);
@@ -78,5 +88,10 @@ public class RedisCacheService implements CacheService {
     @Override
     public void removeFromSet(String key, String value) {
         redisTemplate.opsForSet().remove(key, value);
+    }
+
+    @Override
+    public Long decrement(String key) {
+        return redisTemplate.opsForValue().decrement(key);
     }
 }

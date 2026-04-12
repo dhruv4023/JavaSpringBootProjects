@@ -13,7 +13,7 @@ import com.authserver.authserver.user.models.UserModel;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FailedEvents extends BaseModel {
+public class FinalStageEvents extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class FailedEvents extends BaseModel {
     @Column(name = "event_type", nullable = false)
     private String eventType;
 
-    @Column(name = "payload", columnDefinition = "json", nullable = false)
+    @Column(name = "payload", columnDefinition = "json")
     private String payload;
 
     @Enumerated(EnumType.STRING)

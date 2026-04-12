@@ -55,6 +55,12 @@ public class EmailUtil {
         if (Boolean.valueOf(sendMail)) {
             log.info("Sending email - to: {}, subject: {}, body: {}, studioId: {}, attachmentFileName: {}", to, subject,
                     body, null, attachmentFileName);
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            log.info("email sent successfully");
         } else {
             JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
             mailSender.setHost(mailHost);

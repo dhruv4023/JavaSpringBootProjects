@@ -1,6 +1,6 @@
 package com.authserver.authserver.user.entry;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,13 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignupEntry {
-
+public class ForgotPasswordEntry {
     private String username;
-
-    @Email
-    @NotBlank
-    private String email;
-
-    private String roleName;
 }
