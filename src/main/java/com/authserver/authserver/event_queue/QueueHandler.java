@@ -7,6 +7,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.authserver.authserver.event_queue.entry.BulkResult;
+import com.authserver.authserver.event_queue.entry.EventQueueEntry;
+import com.authserver.authserver.event_queue.enums.EventProcessingStrategy;
+import com.authserver.authserver.event_queue.enums.EventSendType;
+import com.authserver.authserver.event_queue.enums.FailureStrategy;
 import com.authserver.authserver.event_queue.models.EventQueue;
 import com.authserver.authserver.event_queue.models.FinalStageEvents;
 import com.authserver.authserver.event_queue.repository.EventQueueRepository;
@@ -19,9 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -33,26 +40,39 @@ public abstract class QueueHandler implements QueueHandlerInterface {
     private final EventQueueRepository queueRepo;
     private final UserManager userManager;
     private final FailedEventRepository failedRepo;
+    private final String eventType;
 
-    protected abstract void send(EventQueueEntry events) throws Exception;
+    protected int maxRetryCount = 3;
+    protected int handlMaxAtaTime = 10;
+    protected int nextRetryAfterXMinutes = 1;
+    protected int maxRandomDelayInMinutes = 7;
+    protected EventSendType eventSendType = EventSendType.ONE_BY_ONE;
+    protected FailureStrategy failureStrategy = FailureStrategy.RETRY_AND_STORE;
+    protected EventProcessingStrategy sendType = EventProcessingStrategy.ONE_PER_SENDER;
 
+    @Override
     public EventQueueRepository getQueueRepo() {
         return queueRepo;
     }
 
+    @Override
+    public String getEventType() {
+        return eventType;
+    }
+
     @Async
     @Override
-    public void handle(Integer maxAtATime) {
-        log.info("Handler called for event type: {}", eventType());
+    public void handle() {
+        log.info("Handler called for event type: {}", eventType);
 
         try {
-            if (redisCacheService.getOrDefault(eventType(), Integer.class, 0) <= 0) {
-                log.info("no data available for: {}, skipping proccess events", eventType());
+            if (redisCacheService.getOrDefault(eventType, Integer.class, 0) <= 0) {
+                log.info("no data available for: {}, skipping proccess events", eventType);
                 return;
             }
         } catch (Exception e) {
-            if (queueRepo.countByEventType(eventType()) == 0) {
-                log.info("db check; no data available for: {}, skipping proccess events", eventType());
+            if (queueRepo.countByEventType(eventType) == 0) {
+                log.info("db check; no data available for: {}, skipping proccess events", eventType);
                 return;
             }
         }
@@ -63,64 +83,168 @@ public abstract class QueueHandler implements QueueHandlerInterface {
         }
 
         try {
-            processEvents(maxAtATime);
+            processEvents();
         } finally {
             LOCK.set(false);
         }
 
-        log.info("Handler finished for event type: {}", eventType());
+        log.info("Handler finished for event type: {}", eventType);
     }
 
-    protected void processEvents(Integer maxAtATime) {
-        log.info("Processing events for event type: {}", eventType());
-        while (true) {
-            Page<EventQueue> page;
-            if (limitOnePerSender()) {
-                page = queueRepo.fetchBatchDistinctSender(
-                        eventType(),
-                        PageRequest.of(0, maxAtATime));
-            } else {
-                page = queueRepo.findByEventTypeAndNextRetryAfterBefore(
-                        eventType(),
-                        Instant.now(),
-                        PageRequest.of(0, maxAtATime));
-            }
+    @Override
+    public boolean addToQueue(EventQueueEntry entry) {
+        UserModel user = Objects.nonNull(entry.getSenderId())
+                ? userManager.findUserModelByID(entry.getSenderId())
+                : null;
 
-            List<EventQueue> events = page.getContent();
+        EventQueue event = EventQueue.builder()
+                .eventType(eventType)
+                .nextRetryAfter(Instant.now())
+                .status(QueueStatus.PENDING)
+                .payload(entry.getPayload())
+                .retryCount(entry.getRetryCount())
+                .sender(user)
+                .build();
+
+        queueRepo.save(event);
+        try {
+            redisCacheService.increment(eventType);
+        } catch (Exception e) {
+            log.info("Failed to increase count of {}", eventType);
+        }
+        return true;
+    }
+
+    protected void send(EventQueueEntry event) throws Exception {
+        throw new UnsupportedOperationException("Not implemented for eventType " + eventType);
+    }
+
+    protected List<BulkResult> sendBulk(List<EventQueueEntry> events) {
+        throw new UnsupportedOperationException("Not implemented for eventType " + eventType);
+    }
+
+    protected void processEvents() {
+        log.info("Processing events for event type: {}", eventType);
+        while (true) {
+            List<EventQueue> events = getData().getContent();
             if (events.isEmpty()) {
                 break;
             }
-
-            for (EventQueue event : events) {
-                processEvent(event);
-            }
+            sendAllEvents(events);
         }
-        log.info("Finished processing events for event type: {}", eventType());
+        log.info("Finished processing events for event type: {}", eventType);
+    }
+
+    private void sendAllEvents(List<EventQueue> events) {
+        switch (eventSendType) {
+            case ONE_BY_ONE:
+                for (EventQueue event : events) {
+                    processEventOneByOne(event);
+                }
+                break;
+
+            case BULK:
+                handleBulk(events);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Not implemented");
+        }
     }
 
     @Transactional
-    protected void processEvent(EventQueue event) {
+    protected void processEventOneByOne(EventQueue event) {
         try {
             send(toEntry(event));
-            moveToFinalStage(event, null);
+            handleAfterSendOrFailure(event, null);
             randomDelay();
         } catch (Exception e) {
-            handleFailure(event, e.getMessage());
+            handleAfterSendOrFailure(event, e.getMessage());
             sleep(30000);
         }
     }
 
-    @Transactional
-    private void handleFailure(EventQueue event, String error) {
-        int retry = event.getRetryCount() == null ? 1 : event.getRetryCount();
+    protected void handleBulk(List<EventQueue> events) {
 
-        if (retry < maxRetryCount() && shouldRetry(error)) {
-            event.setRetryCount(retry + 1);
-            event.setNextRetryAfter(Instant.now().plusMillis(nextRetryAfterXMinutes() * 60 * 1000));
-            queueRepo.save(event);
-        } else {
-            moveToFinalStage(event, error);
+        List<EventQueueEntry> entries = events.stream()
+                .map(this::toEntry)
+                .toList();
+
+        List<BulkResult> results = sendBulk(entries);
+
+        Map<Long, EventQueue> eventMap = events.stream()
+                .collect(Collectors.toMap(EventQueue::getId, e -> e));
+
+        for (BulkResult result : results) {
+            EventQueue event = eventMap.get(result.getEventId());
+            if (Objects.nonNull(event))
+                handleAfterSendOrFailure(event, result.getError());
         }
+    }
+
+    private void handleAfterSendOrFailure(EventQueue event, String error) {
+        switch (failureStrategy) {
+            case IGNORE:
+                deleteEvent(event);
+                break;
+            case RETRY:
+                if (Objects.nonNull(error)) {
+                    boolean isHandled = handleFailure(event, error);
+                    if (!isHandled) {
+                        deleteEvent(event);
+                    }
+                }
+                break;
+            case RETRY_AND_STORE:
+                boolean isHandled = handleFailure(event, error);
+                if (!isHandled) {
+                    moveToFinalStage(event, error);
+                }
+                break;
+            case RETRY_STORE_ALERT:
+                throw new UnsupportedOperationException("not implemented");
+            default:
+                throw new UnsupportedOperationException("Unsupported failure strategy");
+        }
+    }
+
+    private void deleteEvent(EventQueue event) {
+        queueRepo.delete(event);
+    }
+
+    protected boolean shouldRetry(String error) {
+        return true;
+    }
+
+    private Page<EventQueue> getData() {
+        switch (sendType) {
+            case ONE_PER_SENDER:
+                return queueRepo.fetchBatchDistinctSender(
+                        eventType,
+                        PageRequest.of(0, handlMaxAtaTime));
+
+            case BY_EVENT_TYPE:
+                return queueRepo.findByEventTypeAndNextRetryAfterBefore(
+                        eventType,
+                        Instant.now(),
+                        PageRequest.of(0, handlMaxAtaTime));
+            case BY_USER:
+                throw new UnsupportedOperationException("Not implemented");
+            default:
+                throw new RuntimeException("Invalid send type");
+        }
+    }
+
+    @Transactional
+    private boolean handleFailure(EventQueue event, String error) {
+        int retry = event.getRetryCount() == null ? 0 : event.getRetryCount();
+        if (retry < maxRetryCount && shouldRetry(error)) {
+            event.setRetryCount(retry + 1);
+            event.setNextRetryAfter(Instant.now().plusMillis(nextRetryAfterXMinutes * 60 * 1000));
+            queueRepo.save(event);
+            return true;
+        }
+        return false;
     }
 
     @Transactional
@@ -142,32 +266,11 @@ public abstract class QueueHandler implements QueueHandlerInterface {
                 .build();
 
         failedRepo.save(failedEvent);
-        queueRepo.delete(event);
+        deleteEvent(event);
         try {
-            redisCacheService.decrement(eventType());
+            redisCacheService.decrement(eventType);
         } catch (Exception e) {
-            log.info("Failed to decrease count of {}", eventType());
-        }
-    }
-
-    protected boolean shouldRetry(String error) {
-        return true;
-    }
-
-    private void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException ignored) {
-        }
-    }
-
-    private void randomDelay() {
-        try {
-
-            int delay = 3000 + RANDOM.nextInt(7000);
-            Thread.sleep(delay);
-
-        } catch (InterruptedException ignored) {
+            log.info("Failed to decrease count of {}", eventType);
         }
     }
 
@@ -181,45 +284,18 @@ public abstract class QueueHandler implements QueueHandlerInterface {
                 .build();
     }
 
-    @Override
-    public boolean addToQueue(EventQueueEntry entry) {
-        UserModel user = Objects.nonNull(entry.getSenderId()) ? userManager.findUserModelByID(entry.getSenderId())
-                : null;
-
-        EventQueue event = EventQueue.builder()
-                .eventType(eventType())
-                .nextRetryAfter(Instant.now())
-                .status(QueueStatus.PENDING)
-                .payload(entry.getPayload())
-                .retryCount(entry.getRetryCount())
-                .sender(user)
-                .build();
-        queueRepo.save(event);
+    private void sleep(long millis) {
         try {
-            redisCacheService.increment(eventType());
-        } catch (Exception e) {
-            log.info("Failed to increase count of {}", eventType());
+            Thread.sleep(millis);
+        } catch (InterruptedException ignored) {
         }
-        return true;
     }
 
-    @Override
-    public Integer handlMaxAtaTime() {
-        return 10;
-    }
-
-    @Override
-    public boolean limitOnePerSender() {
-        return true;
-    }
-
-    @Override
-    public int maxRetryCount() {
-        return 3;
-    }
-
-    @Override
-    public Integer nextRetryAfterXMinutes() {
-        return 2;
+    private void randomDelay() {
+        try {
+            int delay = 3000 + RANDOM.nextInt(maxRandomDelayInMinutes * 1000);
+            Thread.sleep(delay);
+        } catch (InterruptedException ignored) {
+        }
     }
 }

@@ -65,7 +65,7 @@ public class SecurityConfig<S extends Session> {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai/**").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai/**", "/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement -> sessionManagement
                         .maximumSessions(1)
@@ -97,7 +97,7 @@ public class SecurityConfig<S extends Session> {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://127.0.0.1:5500"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Time-Zone", "X-AI-Service-Key",
                 "X-AI-Signature", "X-Request-Time"));

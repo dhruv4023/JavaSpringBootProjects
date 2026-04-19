@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import com.authserver.authserver.event_queue.models.EventQueue;
+import com.authserver.authserver.user.models.UserModel;
 
 @Repository
 public interface EventQueueRepository extends JpaRepository<EventQueue, Long> {
@@ -45,4 +46,6 @@ public interface EventQueueRepository extends JpaRepository<EventQueue, Long> {
                          GROUP BY e.eventType
                      """)
        List<Object[]> countPendingGroupedByEventType();
+
+       Page<EventQueue> findBySenderAndEventType(UserModel sender, String eventType, Pageable pageable);
 }

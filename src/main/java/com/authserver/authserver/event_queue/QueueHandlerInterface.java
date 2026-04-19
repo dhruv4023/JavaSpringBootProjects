@@ -1,17 +1,14 @@
 package com.authserver.authserver.event_queue;
 
+import com.authserver.authserver.event_queue.entry.EventQueueEntry;
+import com.authserver.authserver.event_queue.repository.EventQueueRepository;
+
 public interface QueueHandlerInterface {
-
-    String eventType();
-
-    void handle(Integer maxAtATime);
-
-    boolean limitOnePerSender();
+    void handle();
 
     boolean addToQueue(EventQueueEntry entry);
 
-    int maxRetryCount();
+    public abstract String getEventType();
 
-    Integer handlMaxAtaTime();
-    Integer nextRetryAfterXMinutes();
+    public abstract EventQueueRepository getQueueRepo();
 }

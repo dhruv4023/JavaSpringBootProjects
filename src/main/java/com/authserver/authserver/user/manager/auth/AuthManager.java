@@ -10,8 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.authserver.authserver.event_queue.EventQueueEntry;
 import com.authserver.authserver.event_queue.QueueHandlerInterface;
+import com.authserver.authserver.event_queue.entry.EventQueueEntry;
 import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
@@ -159,7 +159,7 @@ public class AuthManager implements AuthManagerInterface {
 
     private QueueHandlerInterface getHandler(String eventType) {
         return handlers.stream()
-                .filter(h -> h.eventType().equals(eventType))
+                .filter(h -> h.getEventType().equals(eventType))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No handler for event: " + eventType));
     }

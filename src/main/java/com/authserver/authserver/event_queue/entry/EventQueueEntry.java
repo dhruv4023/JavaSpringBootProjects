@@ -1,4 +1,6 @@
-package com.authserver.authserver.event_queue;
+package com.authserver.authserver.event_queue.entry;
+
+import com.authserver.authserver.event_queue.QueueStatus;
 
 import lombok.*;
 
