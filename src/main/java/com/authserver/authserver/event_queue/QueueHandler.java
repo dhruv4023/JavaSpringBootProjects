@@ -193,6 +193,8 @@ public abstract class QueueHandler implements QueueHandlerInterface {
                     if (!isHandled) {
                         deleteEvent(event);
                     }
+                }else{
+                    deleteEvent(event);
                 }
                 break;
             case RETRY_AND_STORE:
