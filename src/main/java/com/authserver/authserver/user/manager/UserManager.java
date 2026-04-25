@@ -10,13 +10,12 @@ import com.authserver.authserver.base.BaseManager;
 import com.authserver.authserver.base.enums.RoleEnum;
 import com.authserver.authserver.user.entry.UserEntry;
 import com.authserver.authserver.user.exceptions.UserAlreadyExistsException;
+import com.authserver.authserver.user.exceptions.UserNotFoundException;
 import com.authserver.authserver.user.models.RoleModel;
 import com.authserver.authserver.user.models.UserModel;
 import com.authserver.authserver.user.repositories.RoleRepository;
 import com.authserver.authserver.user.repositories.UserRepository;
 import com.authserver.authserver.user.util.RandomPassword;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Component
 public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRepository> {
@@ -36,12 +35,12 @@ public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRep
     }
 
     @Override
-    protected UserModel toEntity(UserEntry entry, UserModel existing) throws EntityNotFoundException {
+    protected UserModel toEntity(UserEntry entry, UserModel existing) {
         return userConvertor.toModel(entry, existing);
     }
 
     @Override
-    protected UserEntry toEntry(UserModel entity) throws EntityNotFoundException {
+    protected UserEntry toEntry(UserModel entity) {
         return userConvertor.toEntry(entity);
     }
 
@@ -50,12 +49,11 @@ public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRep
     }
 
     public UserModel findUserModelByUsername(String username) {
-        return repository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return repository.findByUsername(username).orElseThrow(UserNotFoundException::new);
     }
 
-
     private UserModel findUserModelByEmail(String email) {
-        return repository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return repository.findByEmail(email).orElseThrow(UserNotFoundException::new);
     }
 
     public UserEntry findUserByEmail(String email) {
@@ -69,7 +67,7 @@ public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRep
 
     public UserModel findUserModelByID(Long userId) {
         Objects.requireNonNull(userId, "User id cannot be null");
-        return repository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
+        return repository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 
     public String save(UserModel user) {

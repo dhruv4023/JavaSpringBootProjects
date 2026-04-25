@@ -9,7 +9,6 @@ import com.authserver.authserver.communication.entry.TemplateEntry;
 import com.authserver.authserver.communication.models.TemplateModel;
 import com.authserver.authserver.communication.repository.TemplatesRepository;
 import com.authserver.authserver.user.models.UserModel;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.Setter;
 
 @Setter(onMethod = @__({ @Autowired }))
@@ -21,7 +20,7 @@ public class TemplateManager extends BaseManager<Long, TemplateEntry, TemplateMo
     }
 
     @Override
-    protected TemplateModel toEntity(TemplateEntry entry, TemplateModel existing) throws EntityNotFoundException {
+    protected TemplateModel toEntity(TemplateEntry entry, TemplateModel existing) {
         TemplateModel templateModel = existing == null ? new TemplateModel() : existing;
         if (Objects.nonNull(entry.getId())) {
             templateModel.setId(entry.getId());
@@ -44,7 +43,7 @@ public class TemplateManager extends BaseManager<Long, TemplateEntry, TemplateMo
     }
 
     @Override
-    protected TemplateEntry toEntry(TemplateModel entity) throws EntityNotFoundException {
+    protected TemplateEntry toEntry(TemplateModel entity) {
         TemplateEntry templateEntry = new TemplateEntry();
         templateEntry.setId(entity.getId());
         templateEntry.setName(entity.getName());

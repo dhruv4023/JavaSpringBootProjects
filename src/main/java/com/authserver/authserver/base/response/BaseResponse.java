@@ -1,23 +1,42 @@
 package com.authserver.authserver.base.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 import com.authserver.authserver.base.helper.PageResponse;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class BaseResponse<T> {
-    public BaseResponse(boolean success, String message) {
-        this.success = success;
-        this.message = message;
-    }
+
     private boolean success;
     private String message;
-    private List<T> data;
+    private String errorCode;
+    private T data;
     private PageResponse page;
+
+    public static <T> BaseResponse<T> success(String message, T data) {
+        BaseResponse<T> res = new BaseResponse<>();
+        res.success = true;
+        res.message = message;
+        res.data = data;
+        return res;
+    }
+
+    public static <T> BaseResponse<T> success(String message, T data, PageResponse page) {
+        BaseResponse<T> res = new BaseResponse<>();
+        res.success = true;
+        res.message = message;
+        res.data = data;
+        res.page = page;
+        return res;
+    }
+
+    public static <T> BaseResponse<T> failure(String message, String errorCode) {
+        BaseResponse<T> res = new BaseResponse<>();
+        res.success = false;
+        res.message = message;
+        res.errorCode = errorCode;
+        return res;
+    }
 }

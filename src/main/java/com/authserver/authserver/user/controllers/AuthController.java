@@ -24,30 +24,27 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<BaseResponse<Void>> signup(@Valid @RequestBody SignupEntry signupEntry) {
-        BaseResponse<Void> response = authService.signup(signupEntry);
-        return ResponseEntity.ok(response);
+        return authService.signup(signupEntry);
     }
 
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<AuthResponse>> login(@RequestBody LoginEntry loginEntry) {
-        BaseResponse<AuthResponse> response = authService.login(loginEntry);
-        return ResponseEntity.ok(response);
+        return authService.login(loginEntry);
     }
-  
+
     @PostMapping("/google/login")
     public ResponseEntity<BaseResponse<AuthResponse>> googleLogin(@RequestBody TokenRequest request) {
-        BaseResponse<AuthResponse> response = authService.googleLogin(request);
-        return ResponseEntity.ok(response);
+        return authService.googleLogin(request);
     }
 
     @PostMapping("/forgot-password")
     public ResponseEntity<BaseResponse<Void>> forgotPassword(@RequestBody ForgotPasswordEntry forgotPasswordEntry) {
-        return ResponseEntity.ok(authService.forgotPassword(forgotPasswordEntry));
+        return authService.forgotPassword(forgotPasswordEntry);
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<BaseResponse<Void>> changerPassword(@RequestBody ChangePasswordEntry forgotPasswordEntry) {
-        return ResponseEntity.ok(authService.changePassword(forgotPasswordEntry));
+        return authService.changePassword(forgotPasswordEntry);
     }
 
 }

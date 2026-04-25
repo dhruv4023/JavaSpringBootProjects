@@ -7,8 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import jakarta.persistence.EntityNotFoundException;
+import com.authserver.authserver.base.exception.ResourceNotFoundException;
 
 public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<Entity, ID>> {
 
@@ -20,12 +19,11 @@ public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<
         this.entityName = entityName;
     }
 
-    protected abstract Entity toEntity(Entry entry, Entity existing)
-            throws EntityNotFoundException;
+    protected abstract Entity toEntity(Entry entry, Entity existing);
 
-    protected abstract Entry toEntry(Entity entity) throws EntityNotFoundException;
+    protected abstract Entry toEntry(Entity entity);
 
-    public Entry add(Entry entry) throws EntityNotFoundException {
+    public Entry add(Entry entry) throws ResourceNotFoundException {
         Objects.requireNonNull(entry, "Entry must not be null");
         Entity entity = toEntity(entry, null);
         Objects.requireNonNull(entity, "Entity must not be null");
@@ -38,11 +36,11 @@ public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<
         return true;
     }
 
-    public Entry update(ID id, Entry entry) throws EntityNotFoundException {
+    public Entry update(ID id, Entry entry) throws ResourceNotFoundException {
         Objects.requireNonNull(id, "ID must not be null");
 
         Entity existing = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(entityName + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(entityName));
         validateUpdateEntry(entry, toEntry(existing));
         Entity updated = toEntity(entry, existing);
         Objects.requireNonNull(updated, "Updated entity must not be null");
@@ -54,17 +52,17 @@ public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<
         return true;
     }
 
-    public void delete(ID id) throws EntityNotFoundException {
+    public void delete(ID id) throws ResourceNotFoundException {
         Objects.requireNonNull(id, "ID must not be null");
         repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(entityName + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(entityName));
         repository.deleteById(id);
     }
 
-    public Entry getById(ID id) throws EntityNotFoundException {
+    public Entry getById(ID id) throws ResourceNotFoundException {
         Objects.requireNonNull(id, "ID must not be null");
         Entity entity = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(entityName + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(entityName));
         return toEntry(entity);
     }
 

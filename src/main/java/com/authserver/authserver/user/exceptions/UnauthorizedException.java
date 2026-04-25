@@ -6,6 +6,6 @@ import com.authserver.authserver.base.exception.BaseApiException;
 
 public class UnauthorizedException extends BaseApiException {
     public UnauthorizedException(String message) {
-        super(message, HttpStatus.UNAUTHORIZED);
+        super(message, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED");
     }
 }

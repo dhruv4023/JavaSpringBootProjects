@@ -3,7 +3,6 @@ package com.authserver.authserver.communication.util;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.util.ByteArrayDataSource;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.authserver.authserver.base.exception.ResourceNotFoundException;
 import com.authserver.authserver.base.exception.ValidationException;
 import com.authserver.authserver.communication.exceptions.EmailSendingException;
 import com.authserver.authserver.communication.models.EmailCredentials;
@@ -70,7 +70,7 @@ public class EmailUtil {
 
             if (userId != null) {
                 EmailCredentials studio = emailCredentialsRepository.findById(userId)
-                        .orElseThrow(() -> new EntityNotFoundException("Email Credentials not found"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Email Credentials"));
                 if (!StringUtils.hasText(studio.getPasscode())) {
                     throw new ValidationException("Studio email passcode is missing");
                 }

@@ -8,7 +8,6 @@ import com.authserver.authserver.user.entry.RoleEntry;
 import com.authserver.authserver.user.models.RoleModel;
 import com.authserver.authserver.user.repositories.RoleRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.Setter;
 
 @Setter(onMethod = @__({ @Autowired }))
@@ -23,12 +22,12 @@ public class RoleManager extends BaseManager<Long, RoleEntry, RoleModel, RoleRep
     }
 
     @Override
-    protected RoleModel toEntity(RoleEntry entry, RoleModel existing) throws EntityNotFoundException {
+    protected RoleModel toEntity(RoleEntry entry, RoleModel existing) {
         return roleConvertor.toModel(entry, existing);
     }
 
     @Override
-    protected RoleEntry toEntry(RoleModel entity) throws EntityNotFoundException {
+    protected RoleEntry toEntry(RoleModel entity) {
         return roleConvertor.toEntry(entity);
     }
 

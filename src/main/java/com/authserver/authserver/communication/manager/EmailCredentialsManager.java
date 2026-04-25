@@ -9,7 +9,6 @@ import com.authserver.authserver.communication.entry.EmailCredentialsEntry;
 import com.authserver.authserver.communication.models.EmailCredentials;
 import com.authserver.authserver.communication.repository.EmailCredentialsRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.Setter;
 
 @Setter(onMethod = @__({ @Autowired }))
@@ -22,8 +21,7 @@ public class EmailCredentialsManager
     }
 
     @Override
-    protected EmailCredentials toEntity(EmailCredentialsEntry entry, EmailCredentials existing)
-            throws EntityNotFoundException {
+    protected EmailCredentials toEntity(EmailCredentialsEntry entry, EmailCredentials existing) {
         EmailCredentials emailCredentials = existing == null ? new EmailCredentials() : existing;
         emailCredentials.setId(entry.getUserId());
         emailCredentials.setPasscode(entry.getPasscode());
@@ -31,7 +29,7 @@ public class EmailCredentialsManager
     }
 
     @Override
-    protected EmailCredentialsEntry toEntry(EmailCredentials entity) throws EntityNotFoundException {
+    protected EmailCredentialsEntry toEntry(EmailCredentials entity) {
         EmailCredentialsEntry emailCredentialsEntry = new EmailCredentialsEntry();
         if (Objects.nonNull(entity.getUser().getId())) {
             emailCredentialsEntry.setUserId(entity.getUser().getId());

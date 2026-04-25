@@ -1,5 +1,7 @@
 package com.authserver.authserver.base.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +36,7 @@ public abstract class BaseController<ID, Entry, Service extends BaseService<ID, 
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<BaseResponse<Entry>> getAll(@RequestParam(defaultValue = "0") long page,
+    public ResponseEntity<BaseResponse<List<Entry>>> getAll(@RequestParam(defaultValue = "0") long page,
             @RequestParam(defaultValue = "10") long size) {
         return service.getAll(page, size);
     }

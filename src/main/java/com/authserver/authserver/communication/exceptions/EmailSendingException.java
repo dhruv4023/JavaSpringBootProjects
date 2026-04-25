@@ -7,8 +7,7 @@ import com.authserver.authserver.base.exception.BaseApiException;
 public class EmailSendingException extends BaseApiException {
 
     public EmailSendingException(String message, Throwable cause) {
-        super(message, HttpStatus.INTERNAL_SERVER_ERROR);
+        super(message, HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SENDING_ERROR");
         initCause(cause);
     }
 }
-

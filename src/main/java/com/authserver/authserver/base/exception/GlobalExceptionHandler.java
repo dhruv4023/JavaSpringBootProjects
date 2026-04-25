@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<Object>> handleBaseApiException(BaseApiException ex) {
         return ResponseEntity
                 .status(Objects.requireNonNull(ex.getStatus()))
-                .body(new BaseResponse<>(false, ex.getMessage(), null, null));
+                .body(BaseResponse.failure(ex.getMessage(), ex.getErrorCode()));
     }
 
     @ExceptionHandler(Exception.class)
@@ -24,6 +24,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new BaseResponse<>(false, "Internal server error: " + ex.getMessage(), null, null));
+                .body(BaseResponse.failure("Internal server error: " + ex.getMessage(), "INTERNAL_SERVER_ERROR"));
     }
 }

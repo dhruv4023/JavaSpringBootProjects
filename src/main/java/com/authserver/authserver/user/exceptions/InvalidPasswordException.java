@@ -6,6 +6,6 @@ import com.authserver.authserver.base.exception.BaseApiException;
 
 public class InvalidPasswordException extends BaseApiException {
     public InvalidPasswordException(String message) {
-        super(message, HttpStatus.UNAUTHORIZED);
+        super(message, HttpStatus.UNAUTHORIZED, "INVALID_PASSWORD");
     }
 }

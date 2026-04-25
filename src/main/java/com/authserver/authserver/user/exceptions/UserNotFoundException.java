@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import com.authserver.authserver.base.exception.BaseApiException;
 
 public class UserNotFoundException extends BaseApiException {
-    public UserNotFoundException(String message) {
-        super(message, HttpStatus.NOT_FOUND);
+    public UserNotFoundException() {
+        super("user not found", HttpStatus.NOT_FOUND, "USER_NOT_FOUND");
     }
 }

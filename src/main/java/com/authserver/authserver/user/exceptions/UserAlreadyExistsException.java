@@ -6,6 +6,6 @@ import com.authserver.authserver.base.exception.BaseApiException;
 
 public class UserAlreadyExistsException extends BaseApiException {
     public UserAlreadyExistsException(String message) {
-        super(message, HttpStatus.CONFLICT);
+        super(message, HttpStatus.CONFLICT, "USER_ALREADY_EXISTS");
     }
 }

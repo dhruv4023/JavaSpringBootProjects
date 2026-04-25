@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.authserver.authserver.event_queue.QueueHandlerInterface;
 import com.authserver.authserver.event_queue.entry.EventQueueEntry;
 import com.authserver.authserver.google_auth.GoogleUser;
-import com.authserver.authserver.google_auth.TokenRequest;
 import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
@@ -21,14 +20,13 @@ import com.authserver.authserver.user.entry.SignupEntry;
 import com.authserver.authserver.user.entry.UserEntry;
 import com.authserver.authserver.user.events.ProducerEmailEvent;
 import com.authserver.authserver.user.exceptions.InvalidPasswordException;
+import com.authserver.authserver.user.exceptions.UserNotFoundException;
 import com.authserver.authserver.user.manager.UserManager;
 import com.authserver.authserver.user.models.UserModel;
 import com.authserver.authserver.user.response.AuthResponse;
 import com.authserver.authserver.user.security.JwtService;
 import com.authserver.authserver.user.util.RandomPassword;
 import com.authserver.authserver.user.util.SecurityUtils;
-
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 
 @Component
@@ -172,7 +170,7 @@ public class AuthManager implements AuthManagerInterface {
         UserEntry user = null;
         try {
             user = userManager.findUserByEmail(request.getEmail());
-        } catch (EntityNotFoundException e) {
+        } catch (UserNotFoundException e) {
             SignupEntry signupEntry = new SignupEntry();
             signupEntry.setUsername(request.getEmail().split("@")[0]);
             signupEntry.setEmail(request.getEmail());
