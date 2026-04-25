@@ -53,6 +53,15 @@ public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRep
         return repository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
+
+    private UserModel findUserModelByEmail(String email) {
+        return repository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
+    public UserEntry findUserByEmail(String email) {
+        return toEntry(findUserModelByEmail(email));
+    }
+
     public UserModel update(UserModel userModel) {
         Objects.requireNonNull(userModel, "User data cannot be null");
         return repository.save(userModel);

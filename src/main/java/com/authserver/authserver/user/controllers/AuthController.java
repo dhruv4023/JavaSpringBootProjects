@@ -1,6 +1,7 @@
 package com.authserver.authserver.user.controllers;
 
 import com.authserver.authserver.base.response.BaseResponse;
+import com.authserver.authserver.google_auth.TokenRequest;
 import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
@@ -30,6 +31,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<AuthResponse>> login(@RequestBody LoginEntry loginEntry) {
         BaseResponse<AuthResponse> response = authService.login(loginEntry);
+        return ResponseEntity.ok(response);
+    }
+  
+    @PostMapping("/google/login")
+    public ResponseEntity<BaseResponse<AuthResponse>> googleLogin(@RequestBody TokenRequest request) {
+        BaseResponse<AuthResponse> response = authService.googleLogin(request);
         return ResponseEntity.ok(response);
     }
 

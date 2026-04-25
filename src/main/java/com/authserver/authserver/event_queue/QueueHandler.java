@@ -196,8 +196,12 @@ public abstract class QueueHandler implements QueueHandlerInterface {
                 }
                 break;
             case RETRY_AND_STORE:
-                boolean isHandled = handleFailure(event, error);
-                if (!isHandled) {
+                if (Objects.nonNull(error)) {
+                    boolean isHandled = handleFailure(event, error);
+                    if (!isHandled) {
+                        moveToFinalStage(event, error);
+                    }
+                } else {
                     moveToFinalStage(event, error);
                 }
                 break;

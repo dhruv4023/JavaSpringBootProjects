@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.authserver.authserver.event_queue.QueueHandlerInterface;
 import com.authserver.authserver.event_queue.entry.EventQueueEntry;
+import com.authserver.authserver.google_auth.GoogleUser;
+import com.authserver.authserver.google_auth.TokenRequest;
 import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
@@ -26,6 +28,7 @@ import com.authserver.authserver.user.security.JwtService;
 import com.authserver.authserver.user.util.RandomPassword;
 import com.authserver.authserver.user.util.SecurityUtils;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 
 @Component
@@ -162,5 +165,25 @@ public class AuthManager implements AuthManagerInterface {
                 .filter(h -> h.getEventType().equals(eventType))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No handler for event: " + eventType));
+    }
+
+    @Override
+    public AuthResponse googleLogin(GoogleUser request) {
+        UserEntry user = null;
+        try {
+            user = userManager.findUserByEmail(request.getEmail());
+        } catch (EntityNotFoundException e) {
+            SignupEntry signupEntry = new SignupEntry();
+            signupEntry.setUsername(request.getEmail().split("@")[0]);
+            signupEntry.setEmail(request.getEmail());
+            signup(signupEntry);
+            user = userManager.findUserByEmail(request.getEmail());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(),
+                user.getRoleEntry().getRoleName());
+        session.setAttribute("user", user.getUsername());
+        return new AuthResponse(user, token);
     }
 }

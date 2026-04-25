@@ -1,5 +1,6 @@
 package com.authserver.authserver.user.manager.auth;
 
+import com.authserver.authserver.google_auth.GoogleUser;
 import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
@@ -15,4 +16,6 @@ public interface AuthManagerInterface {
     public void changePassword(ChangePasswordEntry changePasswordEntry);
 
     public void forgotPassword(ForgotPasswordEntry forgotPasswordEntry);
+
+    public AuthResponse googleLogin(GoogleUser request);
 }

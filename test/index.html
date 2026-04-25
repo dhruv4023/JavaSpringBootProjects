@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Simple Chat</title>
+</head>
+
+<body>
+
+    <h2>Login + WebSocket Chat</h2>
+
+    <div>
+        <input id="username" placeholder="username" value="dhruv20345" />
+        <input id="password" placeholder="password" type="password" value="123" />
+        <button onclick="login()">Login</button>
+    </div>
+
+    <hr />
+    <div>
+        <input id="otherUsername" placeholder="other username" value="dhruv20345" />
+        <button onclick="startChatWithUser(otherUsername.value)">Start Chat</button>
+    </div>
+    <div id="isLogin"></div>
+
+    <input type="text" id="messageInput" placeholder="Type message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <ul id="messages"></ul>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+
+        let stompClient = null;
+        let token = null;
+        let currentConversationId = null;
+
+        /* =========================
+           1. LOGIN (GET JWT TOKEN)
+        ========================= */
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            axios.post("http://localhost:8000/api/auth/login", {
+                username,
+                password
+            })
+                .then(res => {
+                    token = res.data.data[0].token;
+
+                    localStorage.setItem("token", token);
+
+                    console.log("Logged in:", token);
+                    document.getElementById("isLogin").innerText = "Logged in as " + username + " with token: " + token;
+
+                    connectSocket();
+                })
+                .catch(err => {
+                    document.getElementById("isLogin").innerText = "Login failed";
+                    console.error("Login failed:", err);
+                });
+        }
+
+        /* =========================
+           2. CONNECT WEBSOCKET (STOMP + JWT)
+        ========================= */
+        function connectSocket() {
+
+            token = localStorage.getItem("token");
+
+            const socket = new SockJS("http://localhost:8000/api/ws");
+
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect(
+                {
+                    Authorization: "Bearer " + token
+                },
+                function () {
+                    console.log("Connected to WebSocket");
+                },
+                function (error) {
+                    console.error("WebSocket error:", error);
+                }
+            );
+        }
+
+        function subscribeToConversation(conversationId) {
+
+            stompClient.subscribe(
+                "/topic/conversation." + conversationId,
+                function (msg) {
+                    const data = JSON.parse(msg.body);
+                    showMessage(data.from + ": " + data.content);
+                }
+            );
+        }
+        /* =========================
+           3. SEND MESSAGE
+        ========================= */
+        function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+
+            if (!stompClient) {
+                alert("Not connected");
+                return;
+            }
+
+            const payload = {
+                conversationId: currentConversationId,
+                content: message
+            };
+
+            stompClient.send(
+                "/app/chat.send",
+                {},
+                JSON.stringify(payload)
+            );
+        }
+
+        /* =========================
+           4. UI
+        ========================= */
+        function showMessage(message) {
+            const li = document.createElement("li");
+            li.innerText = message;
+            document.getElementById("messages").appendChild(li);
+        }
+
+
+        function startChatWithUser(otherUsername) {
+
+            axios.post("http://localhost:8000/api/conversation/private", {
+                username: otherUsername
+            }, {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            })
+                .then(res => {
+
+                    currentConversationId = res.data.conversationId;
+
+                    console.log("Conversation:", currentConversationId);
+
+                    subscribeToConversation(currentConversationId);
+                    showMessage("Started chat with " + otherUsername + "| Conversation ID" + currentConversationId);
+
+                });
+        }
+
+    </script>
+
+</body>
+
+</html>

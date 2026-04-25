@@ -65,7 +65,7 @@ public class SecurityConfig<S extends Session> {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai/**", "/ws/**").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai/**", "/ws/**", "/auth/google/login").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement -> sessionManagement
                         .maximumSessions(1)
