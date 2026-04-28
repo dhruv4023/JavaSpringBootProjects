@@ -23,6 +23,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.authserver.authserver.base.ai.AiServiceAuthFilter;
+import com.authserver.authserver.base.service.TimeZoneFilter;
 import com.authserver.authserver.user.security.AuthUserDetailsService;
 import com.authserver.authserver.user.security.DynamicAuthorizationFilter;
 import com.authserver.authserver.user.security.JwtFilter;
@@ -38,6 +39,9 @@ public class SecurityConfig<S extends Session> {
 
     @Autowired
     private JwtFilter jwtFilter;
+
+    @Autowired
+    private TimeZoneFilter timeZoneFilter;
 
     @Autowired
     private DynamicAuthorizationFilter dynamicAuthorizationFilter;
@@ -65,7 +69,9 @@ public class SecurityConfig<S extends Session> {
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai/**", "/ws/**", "/auth/google/login").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai/**",
+                                "/ws/**", "/auth/google/login")
+                        .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement -> sessionManagement
                         .maximumSessions(1)
@@ -78,6 +84,7 @@ public class SecurityConfig<S extends Session> {
                 }, UsernamePasswordAuthenticationFilter.class)
                 // JWT filter
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(timeZoneFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(aiServiceAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(dynamicAuthorizationFilter, JwtFilter.class)
                 .exceptionHandling(e -> e
