@@ -123,6 +123,7 @@ public abstract class QueueHandler implements QueueHandlerInterface {
         throw new UnsupportedOperationException("Not implemented for eventType " + eventType);
     }
 
+    @Transactional
     protected void processEvents() {
         log.info("Processing events for event type: {}", eventType);
         while (true) {
@@ -152,7 +153,6 @@ public abstract class QueueHandler implements QueueHandlerInterface {
         }
     }
 
-    @Transactional
     protected void processEventOneByOne(EventQueue event) {
         try {
             send(toEntry(event));
@@ -193,6 +193,8 @@ public abstract class QueueHandler implements QueueHandlerInterface {
                     if (!isHandled) {
                         deleteEvent(event);
                     }
+                } else {
+                    deleteEvent(event);
                 }
                 break;
             case RETRY_AND_STORE:
@@ -214,6 +216,11 @@ public abstract class QueueHandler implements QueueHandlerInterface {
 
     private void deleteEvent(EventQueue event) {
         queueRepo.delete(event);
+        try {
+            redisCacheService.decrement(eventType);
+        } catch (Exception e) {
+            log.info("Failed to decrease count of {}", eventType);
+        }
     }
 
     protected boolean shouldRetry(String error) {
@@ -271,11 +278,6 @@ public abstract class QueueHandler implements QueueHandlerInterface {
 
         failedRepo.save(failedEvent);
         deleteEvent(event);
-        try {
-            redisCacheService.decrement(eventType);
-        } catch (Exception e) {
-            log.info("Failed to decrease count of {}", eventType);
-        }
     }
 
     private EventQueueEntry toEntry(EventQueue entity) {
