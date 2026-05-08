@@ -9,5 +9,5 @@ import com.authserver.authserver.user.repositories.UserScopedRepository;
 public interface LabelRepository extends UserScopedRepository<LabelModel, Long> {
 
     boolean existsByLabelNameAndUserId(String labelName, Long userId);
-
+    boolean existsByParentId(Long parentId);
 }

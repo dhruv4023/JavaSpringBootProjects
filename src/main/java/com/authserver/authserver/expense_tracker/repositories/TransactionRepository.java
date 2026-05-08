@@ -12,4 +12,5 @@ public interface TransactionRepository extends UserScopedRepository<TransactionM
 
     Page<TransactionModel> findByUserIdAndLabelId(Long userId, Long labelId, Pageable pageable);
 
+    boolean existsByLabelId(Long labelId);
 }
