@@ -7,6 +7,7 @@ import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
+import com.authserver.authserver.user.entry.TokenRefreshRequest;
 import com.authserver.authserver.user.response.AuthResponse;
 
 public interface AuthServiceInterface {
@@ -17,4 +18,6 @@ public interface AuthServiceInterface {
     public ResponseEntity<BaseResponse<Void>> forgotPassword(ForgotPasswordEntry forgotPasswordEntry);
 
     public ResponseEntity<BaseResponse<Void>> changePassword(ChangePasswordEntry forgotPasswordEntry);
+
+    public ResponseEntity<BaseResponse<AuthResponse>> refreshToken(TokenRefreshRequest request);
 }

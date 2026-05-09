@@ -18,7 +18,7 @@ public class TransactionEntry {
 
     private String comment;
 
-    private Long labelId;
+    private LabelEntry label;
 
     private Double amt;
 

@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LabelEntry {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     private String labelName;
@@ -20,7 +19,11 @@ public class LabelEntry {
 
     private Long parentId;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long userId;
+
+    public LabelEntry(Long id, String labelName) {
+        this.id = id;
+        this.labelName = labelName;
+    }
 
 }

@@ -9,6 +9,7 @@ import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
+import com.authserver.authserver.user.entry.TokenRefreshRequest;
 import com.authserver.authserver.user.manager.auth.AuthManagerInterface;
 import com.authserver.authserver.user.response.AuthResponse;
 
@@ -55,4 +56,8 @@ public class AuthService implements AuthServiceInterface {
         return ResponseBuilder.single(() -> authManager.googleLogin(user), "Login successful", null);
     }
 
+    @Override
+    public ResponseEntity<BaseResponse<AuthResponse>> refreshToken(TokenRefreshRequest request) {
+        return ResponseBuilder.single(() -> authManager.refreshToken(request), "Token refreshed successfully", null);
+    }
 }

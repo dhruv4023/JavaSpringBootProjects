@@ -39,7 +39,7 @@ public class LabelConvertor implements ConvertorInterface<LabelEntry, LabelModel
         LabelEntry entry = new LabelEntry();
         entry.setId(model.getId());
         entry.setLabelName(model.getLabelName());
-        entry.setDefaultLabel(model.isDefaultLabel());
+        entry.setDefaultLabel(model.getDefaultLabel());
         entry.setParentId(model.getParent() != null ? model.getParent().getId() : null);
         entry.setUserId(model.getUser() != null ? model.getUser().getId() : null);
         return entry;

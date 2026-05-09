@@ -26,11 +26,11 @@ public class TransactionModel extends BaseModel {
     @Column(name = "date", nullable = false)
     private Instant date;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
     private UserModel user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "label_id", nullable = false)
     private LabelModel label;
 

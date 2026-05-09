@@ -17,11 +17,14 @@ import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
+import com.authserver.authserver.user.entry.TokenRefreshRequest;
 import com.authserver.authserver.user.entry.UserEntry;
 import com.authserver.authserver.user.events.ProducerEmailEvent;
 import com.authserver.authserver.user.exceptions.InvalidPasswordException;
 import com.authserver.authserver.user.exceptions.UserNotFoundException;
+import com.authserver.authserver.user.manager.RefreshTokenManagerInterface;
 import com.authserver.authserver.user.manager.UserManager;
+import com.authserver.authserver.user.models.RefreshTokenModel;
 import com.authserver.authserver.user.models.UserModel;
 import com.authserver.authserver.user.response.AuthResponse;
 import com.authserver.authserver.user.security.JwtService;
@@ -51,6 +54,9 @@ public class AuthManager implements AuthManagerInterface {
     @Autowired
     private SecurityUtils securityUtil;
 
+    @Autowired
+    private RefreshTokenManagerInterface refreshTokenManager;
+
     AuthManager(ObjectMapper objectMapper, List<QueueHandlerInterface> handlers) {
         this.objectMapper = objectMapper;
         this.handlers = handlers;
@@ -62,8 +68,11 @@ public class AuthManager implements AuthManagerInterface {
         if (passwordEncoder.matches(loginEntry.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user.getId(), loginEntry.getUsername(),
                     user.getRole().getRoleName());
+            
+            RefreshTokenModel refreshTokenModel = refreshTokenManager.createRefreshToken(user);
+
             session.setAttribute("user", loginEntry.getUsername());
-            return new AuthResponse(userEntry, token);
+            return new AuthResponse(userEntry, token, refreshTokenModel.getToken());
         } else {
             throw new InvalidPasswordException("Invalid password for username " + loginEntry.getUsername());
         }
@@ -181,7 +190,25 @@ public class AuthManager implements AuthManagerInterface {
         }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(),
                 user.getRoleEntry().getRoleName());
+        
+        UserModel userModel = userManager.findUserModelByUsername(user.getUsername());
+        RefreshTokenModel refreshTokenModel = refreshTokenManager.createRefreshToken(userModel);
+        
         session.setAttribute("user", user.getUsername());
-        return new AuthResponse(user, token);
+        return new AuthResponse(user, token, refreshTokenModel.getToken());
+    }
+
+    @Override
+    public AuthResponse refreshToken(TokenRefreshRequest request) {
+        RefreshTokenModel refreshTokenModel = refreshTokenManager.findByToken(request.getRefreshToken());
+        refreshTokenManager.verifyExpiration(refreshTokenModel);
+        
+        UserModel user = refreshTokenModel.getUser();
+        UserEntry userEntry = userManager.findByUsername(user.getUsername());
+        
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(),
+                user.getRole().getRoleName());
+        
+        return new AuthResponse(userEntry, token, refreshTokenModel.getToken());
     }
 }

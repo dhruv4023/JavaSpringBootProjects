@@ -2,6 +2,7 @@ package com.authserver.authserver.expense_tracker.manager;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,13 +11,18 @@ import org.springframework.stereotype.Component;
 
 import com.authserver.authserver.base.ConvertorInterface;
 import com.authserver.authserver.expense_tracker.entry.TransactionEntry;
+import com.authserver.authserver.expense_tracker.models.LabelModel;
 import com.authserver.authserver.expense_tracker.models.TransactionModel;
+import com.authserver.authserver.expense_tracker.repositories.LabelRepository;
 import com.authserver.authserver.expense_tracker.repositories.TransactionRepository;
 import com.authserver.authserver.user.manager.ResBaseManager;
 import com.authserver.authserver.user.util.SecurityUtils;
 
 @Component("expenseTransactionManager")
 public class TransactionManager extends ResBaseManager<Long, TransactionEntry, TransactionModel, TransactionRepository> {
+
+    @Autowired
+    private LabelRepository labelRepository;
 
     private final ConvertorInterface<TransactionEntry, TransactionModel> transactionConvertor;
 

@@ -2,16 +2,24 @@ package com.authserver.authserver.expense_tracker.mapper;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.authserver.authserver.base.ConvertorInterface;
+import com.authserver.authserver.expense_tracker.entry.LabelEntry;
 import com.authserver.authserver.expense_tracker.entry.TransactionEntry;
 import com.authserver.authserver.expense_tracker.models.LabelModel;
 import com.authserver.authserver.expense_tracker.models.TransactionModel;
+import com.authserver.authserver.expense_tracker.repositories.LabelRepository;
 import com.authserver.authserver.user.models.UserModel;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Component
 public class TransactionConvertor implements ConvertorInterface<TransactionEntry, TransactionModel> {
+
+    @Autowired
+    private LabelRepository labelRepository;
 
     @Override
     public TransactionModel toModel(TransactionEntry entry, TransactionModel existing) {
@@ -25,9 +33,9 @@ public class TransactionConvertor implements ConvertorInterface<TransactionEntry
         if (Objects.nonNull(entry.getDate())) {
             transaction.setDate(entry.getDate());
         }
-        if (Objects.nonNull(entry.getLabelId())) {
-            LabelModel label = new LabelModel();
-            label.setId(entry.getLabelId());
+        if (Objects.nonNull(entry.getLabel())) {
+            LabelModel label = labelRepository.findById(entry.getLabel().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Label not found with id " + entry.getLabel().getId()));
             transaction.setLabel(label);
         }
         if (Objects.nonNull(entry.getUserId())) {
@@ -45,7 +53,7 @@ public class TransactionConvertor implements ConvertorInterface<TransactionEntry
         entry.setComment(model.getComment());
         entry.setAmt(model.getAmt());
         entry.setDate(model.getDate());
-        entry.setLabelId(model.getLabel() != null ? model.getLabel().getId() : null);
+        entry.setLabel(new LabelEntry(model.getLabel().getId(), model.getLabel().getLabelName()));
         entry.setUserId(model.getUser() != null ? model.getUser().getId() : null);
         return entry;
     }

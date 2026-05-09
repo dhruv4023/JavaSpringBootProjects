@@ -19,7 +19,7 @@ public class LabelModel extends BaseModel {
     private String labelName;
 
     @Column(name = "default_label", nullable = false)
-    private boolean defaultLabel = false;
+    private Boolean defaultLabel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -14,8 +14,55 @@ import com.authserver.authserver.expense_tracker.repositories.LabelRepository;
 import com.authserver.authserver.user.manager.ResBaseManager;
 import com.authserver.authserver.user.util.SecurityUtils;
 
+import jakarta.transaction.Transactional;
+
 @Component
 public class LabelManager extends ResBaseManager<Long, LabelEntry, LabelModel, LabelRepository> {
+
+    @Override
+    @Transactional
+    protected Boolean validateAddEntry(LabelModel entity) {
+        if (Objects.isNull(entity.getDefaultLabel())) {
+            entity.setDefaultLabel(false);
+        }
+
+        if (entity.getParent() == null) {
+            handleDefaultLabel(entity);
+            return true;
+        }
+
+        LabelModel parent = repository.findById(entity.getParent().getId())
+                .orElseThrow(() -> new RuntimeException("Parent label not found"));
+        if (parent.getParent() != null) {
+            throw new RuntimeException(
+                    "Maximum 2 levels of labels allowed");
+        }
+
+        handleDefaultLabel(entity);
+        return true;
+    }
+
+    @Transactional
+    @Override
+    protected Boolean validateUpdateEntry(LabelEntry newEntry,
+            LabelEntry existing) {
+        if (newEntry.getParentId() == null) {
+            handleDefaultLabel(toEntity(newEntry, null));
+            return true;
+        }
+
+        LabelEntry parent = getById(newEntry.getParentId());
+        if (parent.getId().equals(existing.getId())) {
+            throw new RuntimeException("Label cannot be parent of itself");
+        }
+
+        if (parent.getParentId() != null) {
+            throw new RuntimeException(
+                    "Maximum 2 levels of labels allowed");
+        }
+        handleDefaultLabel(toEntity(newEntry, null));
+        return true;
+    }
 
     private final TransactionRepository transactionRepository;
     private final ConvertorInterface<LabelEntry, LabelModel> labelConvertor;
@@ -43,6 +90,10 @@ public class LabelManager extends ResBaseManager<Long, LabelEntry, LabelModel, L
 
     @Override
     public void delete(Long id) throws ResourceNotFoundException {
+        LabelEntry entry = getById(id);
+        if (entry.getDefaultLabel()) {
+            throw new LabelDeleteException("default label");
+        }
         if (repository.existsByParentId(id)) {
             throw new LabelDeleteException("sub labels");
         }
@@ -50,6 +101,22 @@ public class LabelManager extends ResBaseManager<Long, LabelEntry, LabelModel, L
             throw new LabelDeleteException("transactions");
         }
         super.delete(id);
+    }
+
+    @Transactional
+    private void handleDefaultLabel(LabelModel label) {
+
+        if (!Boolean.TRUE.equals(label.getDefaultLabel())) {
+            return;
+        }
+
+        repository.findByDefaultLabelTrueAndUserId(label.getUser().getId())
+                .ifPresent(currentDefault -> {
+                    if (!currentDefault.getId().equals(label.getId())) {
+                        currentDefault.setDefaultLabel(false);
+                        repository.save(currentDefault);
+                    }
+                });
     }
 
 }
