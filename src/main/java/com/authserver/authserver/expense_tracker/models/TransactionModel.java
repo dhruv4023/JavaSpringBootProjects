@@ -9,7 +9,12 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "expense_transactions")
+@Table(name = "expense_transactions", indexes = {
+        // Covers monthly analytics: filter by user + month range
+        @Index(name = "idx_txn_user_date", columnList = "user_id, date"),
+        // Covers category breakdown: filter by user + label + date
+        @Index(name = "idx_txn_user_label_date", columnList = "user_id, label_id, date")
+})
 @Getter
 @Setter
 @NoArgsConstructor

@@ -3,6 +3,7 @@ package com.authserver.authserver.expense_tracker.manager;
 import com.authserver.authserver.expense_tracker.repositories.TransactionRepository;
 import java.util.Objects;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import com.authserver.authserver.base.ConvertorInterface;
@@ -119,4 +120,14 @@ public class LabelManager extends ResBaseManager<Long, LabelEntry, LabelModel, L
                 });
     }
 
+    @Override
+    protected Specification<LabelModel> buildSpecification(String search, Long userId) {
+        return (root, query, cb) -> {
+            if (search == null || search.trim().isEmpty()) {
+                return cb.equal(root.get("user").get("id"), userId);
+            }
+            return cb.and(cb.equal(root.get("user").get("id"), userId),
+                    cb.like(cb.lower(root.get("labelName")), search.toLowerCase() + "%"));
+        };
+    }
 }

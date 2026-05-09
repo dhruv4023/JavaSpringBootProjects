@@ -20,8 +20,8 @@ public class LabelService extends BaseService<Long, LabelEntry, LabelManager> {
         super(manager);
     }
 
-    public ResponseEntity<BaseResponse<List<LabelEntry>>> getAllByUser(long page, long size) {
-        Page<LabelEntry> result = manager.getByUserId(page, size);
+    public ResponseEntity<BaseResponse<List<LabelEntry>>> getAllBySpec(String search, long page, long size) {
+        Page<LabelEntry> result = manager.getBySpec(page, size, search);
         PageResponse pageResponse = new PageResponse(page, size, result.getTotalElements());
         return ResponseBuilder.list(() -> result.getContent(), "Fetched successfully", null, pageResponse);
     }

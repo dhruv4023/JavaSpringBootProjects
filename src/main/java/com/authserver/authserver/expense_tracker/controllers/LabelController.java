@@ -19,9 +19,10 @@ public class LabelController extends BaseController<Long, LabelEntry, LabelServi
 
     @GetMapping("/getAll/user")
     public ResponseEntity<BaseResponse<List<LabelEntry>>> getAllByUser(
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") long page,
             @RequestParam(defaultValue = "10") long size) {
-        return service.getAllByUser(page, size);
+        return service.getAllBySpec(search, page, size);
     }
 
 }

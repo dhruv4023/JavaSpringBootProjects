@@ -7,12 +7,15 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "expense_labels")
+@Table(name = "expense_labels", indexes = {
+        @Index(name = "idx_label_name", columnList = "label_name")
+})
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(callSuper = true)
+
 public class LabelModel extends BaseModel {
 
     @Column(name = "label_name", nullable = false)

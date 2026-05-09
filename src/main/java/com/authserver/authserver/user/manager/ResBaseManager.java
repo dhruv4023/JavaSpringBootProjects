@@ -1,11 +1,10 @@
 package com.authserver.authserver.user.manager;
 
-import java.util.Objects;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import com.authserver.authserver.base.BaseManager;
@@ -23,13 +22,15 @@ abstract public class ResBaseManager<ID, Entry, Entity, Repo extends UserScopedR
         this.securityutil = securityutil;
     }
 
-    public Page<Entry> getByUserId(long page, long size) {
-        Sort sort = getSort();
-        Objects.requireNonNull(sort, "Sort must not be null");
-        Pageable pageable = PageRequest.of((int) page, (int) size, sort);
+    public Page<Entry> getBySpec(long page, long size, String search) {
+        Pageable pageable = PageRequest.of((int) page, (int) size, getSort());
         Long userId = securityutil.getCurrentUserId();
-        Page<Entity> entityPage = repository.findByUserId(userId, pageable);
+        Specification<Entity> spec = buildSpecification(search, userId);
+        Page<Entity> entityPage = repository.findAll(spec, pageable);
         return entityPage.map(this::toEntry);
     }
 
+    protected Specification<Entity> buildSpecification(String search, Long userId) {
+        return (root, query, cb) -> cb.equal(root.get("user").get("id"), userId);
+    }
 }
