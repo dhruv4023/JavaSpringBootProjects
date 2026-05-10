@@ -53,8 +53,8 @@ public class EmailUtil {
         Objects.requireNonNull(body, "Body cannot be null");
 
         if (Boolean.valueOf(sendMail)) {
-            log.info("Sending email - to: {}, subject: {}, body: {}, studioId: {}, attachmentFileName: {}", to, subject,
-                    body, null, attachmentFileName);
+            log.info("Sending email - to: {}, subject: {}, body: {}, studioId: {}, attachmentFileName: {}, userId: {}", to,
+                    subject, body, null, attachmentFileName, userId);
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {

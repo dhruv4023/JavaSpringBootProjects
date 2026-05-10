@@ -27,7 +27,7 @@ public class TransactionService extends BaseService<Long, TransactionEntry, Tran
     }
 
     public ResponseEntity<BaseResponse<List<TransactionEntry>>> getAllByLabel(Long labelId, long page, long size) {
-        Page<TransactionEntry> result = manager.getBySpec(page, size, null);
+        Page<TransactionEntry> result = manager.getByUserIdAndLabelId(labelId, page, size);
         PageResponse pageResponse = new PageResponse(page, size, result.getTotalElements());
         return ResponseBuilder.list(() -> result.getContent(), "Fetched successfully", null, pageResponse);
     }

@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ConsumerUserCreatedEvent {
-    private Long userId;
+    private Long senderId;
     private String toEmail;
     private String subject;
     private String body;

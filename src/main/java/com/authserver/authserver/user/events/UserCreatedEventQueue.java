@@ -14,17 +14,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UserCreatedEventQueue extends ScheduledQueueHandler {
     private final UserEventPublisher userEventPublisher;
     private final ObjectMapper objectMapper = new ObjectMapper();
-   
-   public UserCreatedEventQueue(RedisCacheService redisCacheService, EventQueueRepository queueRepo, UserManager userManager,
+
+    public UserCreatedEventQueue(RedisCacheService redisCacheService, EventQueueRepository queueRepo,
+            UserManager userManager,
             FailedEventRepository failedRepo, UserEventPublisher userEventPublisher) {
         super(redisCacheService, queueRepo, userManager, failedRepo, "user.created");
         this.userEventPublisher = userEventPublisher;
     }
 
     @Override
-    protected void send(EventQueueEntry events) throws Exception{
-        ProducerEmailEvent payload;
-        payload = objectMapper.readValue(events.getPayload(), ProducerEmailEvent.class);
+    protected void send(EventQueueEntry events) throws Exception {
+        ProducerEmailEvent payload = objectMapper.readValue(events.getPayload(), ProducerEmailEvent.class);
+        payload.setSenderId(events.getSenderId());
         userEventPublisher.publishUserCreated(payload);
-    } 
+    }
 }
