@@ -106,7 +106,6 @@ public class AuthManager implements AuthManagerInterface {
         String password = userManager.save(user);
 
         ProducerEmailEvent event = new ProducerEmailEvent();
-        event.setUserId(user.getId());
         event.setToEmail(user.getEmail());
         event.setSubject("Welcome to Auth Server 🎉");
         event.setBody("""
@@ -140,7 +139,6 @@ public class AuthManager implements AuthManagerInterface {
         userManager.update(user);
 
         ProducerEmailEvent event = new ProducerEmailEvent();
-        event.setUserId(user.getId());
         event.setToEmail(user.getEmail());
         event.setSubject("Your New Password");
         event.setBody("""
