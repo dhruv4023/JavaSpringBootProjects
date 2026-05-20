@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.authserver.authserver.base.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,7 +13,7 @@ import com.authserver.authserver.event_queue.models.EventQueue;
 import com.authserver.authserver.user.models.UserModel;
 
 @Repository
-public interface EventQueueRepository extends JpaRepository<EventQueue, Long> {
+public interface EventQueueRepository extends BaseRepository<EventQueue, Long> {
 
        @Query(value = """
                      SELECT *

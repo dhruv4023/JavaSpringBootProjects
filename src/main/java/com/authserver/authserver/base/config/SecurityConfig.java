@@ -12,6 +12,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -70,12 +71,11 @@ public class SecurityConfig<S extends Session> {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/forgot-password", "/", "/ai/**",
-                                "/ws/**", "/auth/google/login")
+                                "/ws/**", "/auth/google/login", "/auth/refresh")
                         .permitAll()
                         .anyRequest().authenticated())
-                .sessionManagement(sessionManagement -> sessionManagement
-                        .maximumSessions(1)
-                        .sessionRegistry(sessionRegistry()))
+                .sessionManagement(
+                        sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore((request, response, chain) -> {
                     HttpServletRequest httpRequest = (HttpServletRequest) request;
                     System.out.println(

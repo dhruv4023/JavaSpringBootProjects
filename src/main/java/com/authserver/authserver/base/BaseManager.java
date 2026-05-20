@@ -6,10 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.domain.Specification;
 import com.authserver.authserver.base.exception.ResourceNotFoundException;
 
-public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<Entity, ID>> {
+public abstract class BaseManager<ID, Entry, Entity, Repo extends BaseRepository<Entity, ID>> {
 
     protected final Repo repository;
     private final String entityName;
@@ -72,6 +72,17 @@ public abstract class BaseManager<ID, Entry, Entity, Repo extends JpaRepository<
         Pageable pageable = PageRequest.of((int) page, (int) size, sort);
         Page<Entity> entityPage = repository.findAll(pageable);
         return entityPage.map(this::toEntry);
+    }
+
+    public Page<Entry> getBySpec(long page, long size, String search) {
+        Pageable pageable = PageRequest.of((int) page, (int) size, getSort());
+        Specification<Entity> spec = buildSpecification(search);
+        Page<Entity> entityPage = repository.findAll(spec, pageable);
+        return entityPage.map(this::toEntry);
+    }
+
+    protected Specification<Entity> buildSpecification(String search) {
+        return (root, query, cb) -> cb.conjunction();
     }
 
     protected Sort getSort() {

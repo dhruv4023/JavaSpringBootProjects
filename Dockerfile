@@ -1,38 +1,37 @@
-# 2 stage java jar application
-# Stage 1: Build the application
-FROM maven:3.8.8-eclipse-temurin-17-alpine AS build
+# =========================
+# Stage 1 - Build
+# =========================
+FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
 
-# Set the working directory
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
-COPY pom.xml /app/pom.xml
+# Copy pom first for caching
+COPY pom.xml .
+
+# Download dependencies
 RUN mvn dependency:go-offline
 
-# Copy the source code and build the WAR/JAR file
-COPY . /app
-RUN mvn package -DskipTests
+# Copy source
+COPY src ./src
 
-# Verify the .jar file exists in the target directory (optional, for debugging)
-RUN ls -al /app/target
+# Build jar
+RUN mvn clean package -DskipTests
 
-# Stage 2: Create the runtime image
-FROM openjdk:17-jdk-alpine
+# =========================
+# Stage 2 - Runtime
+# =========================
+FROM eclipse-temurin:17-jre-alpine
 
-# Set the path for the JAR file
-ARG JAR_FILE=/app/target/*.jar
+WORKDIR /app
 
-# Copy the built JAR file from the build stage
-COPY --from=build ${JAR_FILE} app.jar
+# Copy jar from builder
+COPY --from=build /app/target/*.jar app.jar
 
-# Expose the port that the application will run on
+# App port
 EXPOSE 8080
 
-# Specify the command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
-
-
-
+# JVM optimizations for containers
+ENTRYPOINT ["java", "-Xms128m", "-Xmx512m", "-jar", "app.jar"]
 
 # # Use Maven and JDK in a single stage -----------------------------------------------
 # FROM maven:3.8.8-eclipse-temurin-17-alpine

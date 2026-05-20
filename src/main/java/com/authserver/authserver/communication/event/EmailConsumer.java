@@ -6,7 +6,10 @@ import com.authserver.authserver.rabbitmq.RabbitConfig;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class EmailConsumer {
 
     private final EmailUtil emailUtil;
@@ -19,7 +22,11 @@ public class EmailConsumer {
     public void handleUserCreated(ConsumerUserCreatedEvent event) {
         System.out.println("Sending email to: " + event.getToEmail());
 
-        emailUtil.sendEmail(event.getToEmail(), event.getSubject(), event.getBody(), event.getUserId(),
-                event.getAttachmentBytes(), event.getAttachmentFileName());
+        try {
+            emailUtil.sendEmail(event.getToEmail(), event.getSubject(), event.getBody(), event.getSenderId(),
+                    event.getAttachmentBytes(), event.getAttachmentFileName());
+        } catch (Exception e) {
+            log.error("Email sending failed", e);
+        }
     }
 }

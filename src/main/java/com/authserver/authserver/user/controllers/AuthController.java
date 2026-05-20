@@ -6,6 +6,7 @@ import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
+import com.authserver.authserver.user.entry.TokenRefreshRequest;
 import com.authserver.authserver.user.response.AuthResponse;
 import com.authserver.authserver.user.services.auth.AuthService;
 
@@ -47,4 +48,8 @@ public class AuthController {
         return authService.changePassword(forgotPasswordEntry);
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<BaseResponse<AuthResponse>> refreshToken(@RequestBody TokenRefreshRequest request) {
+        return authService.refreshToken(request);
+    }
 }

@@ -5,6 +5,7 @@ import com.authserver.authserver.user.entry.ChangePasswordEntry;
 import com.authserver.authserver.user.entry.ForgotPasswordEntry;
 import com.authserver.authserver.user.entry.LoginEntry;
 import com.authserver.authserver.user.entry.SignupEntry;
+import com.authserver.authserver.user.entry.TokenRefreshRequest;
 import com.authserver.authserver.user.response.AuthResponse;
 
 public interface AuthManagerInterface {
@@ -18,4 +19,6 @@ public interface AuthManagerInterface {
     public void forgotPassword(ForgotPasswordEntry forgotPasswordEntry);
 
     public AuthResponse googleLogin(GoogleUser request);
+
+    public AuthResponse refreshToken(TokenRefreshRequest request);
 }
