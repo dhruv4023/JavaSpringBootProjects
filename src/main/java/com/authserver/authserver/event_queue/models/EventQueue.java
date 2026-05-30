@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
 
 import com.authserver.authserver.base.BaseModel;
 import com.authserver.authserver.event_queue.QueueStatus;
@@ -16,14 +19,14 @@ import com.authserver.authserver.user.models.UserModel;
 @AllArgsConstructor
 @Builder
 @Table(name = "event_queue", indexes = {
-        @Index(name = "idx_event_queue_sender", columnList = "sender_id"),
+        @Index(name = "idx_event_queue_sender", columnList = "sender_uuid"),
         @Index(name = "idx_event_queue_event_type", columnList = "event_type"),
 })
 public class EventQueue extends BaseModel {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @UuidGenerator
+    @Column(name = "uuid", columnDefinition = "BINARY(16)")
+    private UUID uuid;
 
     @Column(name = "event_type", nullable = false)
     private String eventType;
@@ -36,7 +39,7 @@ public class EventQueue extends BaseModel {
     private QueueStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_uuid")
     private UserModel sender;
 
     @Column(name = "retry_count")

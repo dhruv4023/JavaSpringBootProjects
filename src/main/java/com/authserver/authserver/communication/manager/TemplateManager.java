@@ -1,6 +1,7 @@
 package com.authserver.authserver.communication.manager;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ import lombok.Setter;
 
 @Setter(onMethod = @__({ @Autowired }))
 @Component
-public class TemplateManager extends BaseManager<Long, TemplateEntry, TemplateModel, TemplatesRepository> {
+public class TemplateManager extends BaseManager<UUID, TemplateEntry, TemplateModel, TemplatesRepository> {
 
     protected TemplateManager(TemplatesRepository repository) {
         super(repository, "template");
@@ -22,9 +23,7 @@ public class TemplateManager extends BaseManager<Long, TemplateEntry, TemplateMo
     @Override
     protected TemplateModel toEntity(TemplateEntry entry, TemplateModel existing) {
         TemplateModel templateModel = existing == null ? new TemplateModel() : existing;
-        if (Objects.nonNull(entry.getId())) {
-            templateModel.setId(entry.getId());
-        }
+        templateModel.setUuid(entry.getUuid());
         if (Objects.nonNull(entry.getName())) {
             templateModel.setName(entry.getName());
         }
@@ -34,9 +33,9 @@ public class TemplateManager extends BaseManager<Long, TemplateEntry, TemplateMo
         if (Objects.nonNull(entry.getTitle())) {
             templateModel.setTitle(entry.getTitle());
         }
-        if (Objects.nonNull(entry.getUserId())) {
+        if (Objects.nonNull(entry.getUserUuid())) {
             UserModel user = new UserModel();
-            user.setId(entry.getUserId());
+            user.setUuid(entry.getUserUuid());
             templateModel.setUser(user);
         }
         return templateModel;
@@ -45,11 +44,11 @@ public class TemplateManager extends BaseManager<Long, TemplateEntry, TemplateMo
     @Override
     protected TemplateEntry toEntry(TemplateModel entity) {
         TemplateEntry templateEntry = new TemplateEntry();
-        templateEntry.setId(entity.getId());
+        templateEntry.setUuid(entity.getUuid());
         templateEntry.setName(entity.getName());
         templateEntry.setContent(entity.getContent());
         templateEntry.setTitle(entity.getTitle());
-        templateEntry.setUserId(entity.getUser().getId());
+        templateEntry.setUserUuid(entity.getUser().getUuid());
         return templateEntry;
     }
 

@@ -11,9 +11,9 @@ import java.time.Instant;
 @Entity
 @Table(name = "expense_transactions", indexes = {
         // Covers monthly analytics: filter by user + month range
-        @Index(name = "idx_txn_user_date", columnList = "user_id, date"),
+        @Index(name = "idx_txn_user_uuid_date", columnList = "user_uuid, date"),
         // Covers category breakdown: filter by user + label + date
-        @Index(name = "idx_txn_user_label_date", columnList = "user_id, label_id, date")
+        @Index(name = "idx_txn_user_uuid_label_uuid_date", columnList = "user_uuid, label_uuid, date")
 })
 @Getter
 @Setter
@@ -32,11 +32,11 @@ public class TransactionModel extends BaseModel {
     private Instant date;
 
     @ManyToOne()
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_uuid", nullable = false)
     private UserModel user;
 
     @ManyToOne()
-    @JoinColumn(name = "label_id", nullable = false)
+    @JoinColumn(name = "label_uuid", nullable = false)
     private LabelModel label;
 
 }

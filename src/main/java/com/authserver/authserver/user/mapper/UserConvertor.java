@@ -31,7 +31,7 @@ public class UserConvertor implements ConvertorInterface<UserEntry, UserModel> {
     @Override
     public UserEntry toEntry(UserModel model) {
         UserEntry entry = new UserEntry();
-        entry.setId(model.getId());
+        entry.setUuid(model.getUuid());
         entry.setUsername(model.getUsername());
         entry.setEmail(model.getEmail());
         entry.setRoleEntry(roleConvertor.toEntry(model.getRole()));

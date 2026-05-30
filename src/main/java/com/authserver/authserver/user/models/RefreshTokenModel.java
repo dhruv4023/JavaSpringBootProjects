@@ -19,7 +19,7 @@ public class RefreshTokenModel extends BaseModel {
     private String token;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_uuid", nullable = false)
     private UserModel user;
 
     @Column(nullable = false)

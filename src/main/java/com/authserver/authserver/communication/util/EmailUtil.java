@@ -19,6 +19,7 @@ import com.authserver.authserver.communication.repository.EmailCredentialsReposi
 
 import java.util.Objects;
 import java.util.Properties;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -46,7 +47,7 @@ public class EmailUtil {
     private EmailCredentialsRepository emailCredentialsRepository;
 
     public Boolean sendEmail(String to, String subject, String body,
-            Long userId,
+            UUID userUuid,
             byte[] attachmentBytes, String attachmentFileName) {
         Objects.requireNonNull(to, "To address cannot be null");
         Objects.requireNonNull(subject, "Subject cannot be null");
@@ -54,7 +55,7 @@ public class EmailUtil {
 
         if (Boolean.valueOf(sendMail)) {
             log.info("Sending email - to: {}, subject: {}, body: {}, studioId: {}, attachmentFileName: {}, userId: {}", to,
-                    subject, body, null, attachmentFileName, userId);
+                    subject, body, null, attachmentFileName, userUuid);
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
@@ -68,8 +69,8 @@ public class EmailUtil {
             mailSender.setProtocol("smtp");
             mailSender.setDefaultEncoding(defaultEncoding);
 
-            if (userId != null) {
-                EmailCredentials studio = emailCredentialsRepository.findById(userId)
+            if (userUuid != null) {
+                EmailCredentials studio = emailCredentialsRepository.findById(userUuid)
                         .orElseThrow(() -> new ResourceNotFoundException("Email Credentials"));
                 if (!StringUtils.hasText(studio.getPasscode())) {
                     throw new ValidationException("Studio email passcode is missing");

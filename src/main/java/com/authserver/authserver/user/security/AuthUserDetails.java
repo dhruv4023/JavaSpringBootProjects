@@ -9,10 +9,11 @@ import com.authserver.authserver.user.models.UserModel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 public class AuthUserDetails implements UserDetails {
 
-    private Long userId;
+    private UUID userUuid;
 
     private String username;
     private String password;
@@ -22,7 +23,7 @@ public class AuthUserDetails implements UserDetails {
 
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.userId = user.getId();
+        this.userUuid = user.getUuid();
 
         List<GrantedAuthority> authRouteList = new ArrayList<>();
 
@@ -45,8 +46,8 @@ public class AuthUserDetails implements UserDetails {
         return password;
     }
 
-    public Long getUserId() {
-        return userId;
+    public UUID getUserUuid() {
+        return userUuid;
     }
 
     @Override

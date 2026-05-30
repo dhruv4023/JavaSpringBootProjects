@@ -6,9 +6,10 @@ import com.authserver.authserver.base.BaseRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface RefreshTokenRepository extends BaseRepository<RefreshTokenModel, Long> {
+public interface RefreshTokenRepository extends BaseRepository<RefreshTokenModel, UUID> {
     Optional<RefreshTokenModel> findByToken(String token);
 
     int deleteByUser(UserModel user);

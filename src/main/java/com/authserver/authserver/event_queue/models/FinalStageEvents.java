@@ -2,6 +2,11 @@ package com.authserver.authserver.event_queue.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
+
+import org.hibernate.annotations.UuidGenerator;
+
 import com.authserver.authserver.base.BaseModel;
 import com.authserver.authserver.event_queue.QueueStatus;
 import com.authserver.authserver.user.models.UserModel;
@@ -16,8 +21,9 @@ import com.authserver.authserver.user.models.UserModel;
 public class FinalStageEvents extends BaseModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @UuidGenerator
+    @Column(name = "uuid", columnDefinition = "BINARY(16)")
+    private UUID uuid;
 
     @Column(name = "event_type", nullable = false)
     private String eventType;
@@ -30,7 +36,7 @@ public class FinalStageEvents extends BaseModel {
     private QueueStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_uuid")
     private UserModel sender;
 
     @Column(name = "error")

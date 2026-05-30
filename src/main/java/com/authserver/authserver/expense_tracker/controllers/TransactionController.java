@@ -1,6 +1,7 @@
 package com.authserver.authserver.expense_tracker.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ import com.authserver.authserver.expense_tracker.services.TransactionService;
 
 @RestController
 @RequestMapping("/expense-tracker/transaction")
-public class TransactionController extends BaseController<Long, TransactionEntry, TransactionService> {
+public class TransactionController extends BaseController<UUID, TransactionEntry, TransactionService> {
 
     @GetMapping("/getAll/user")
     public ResponseEntity<BaseResponse<List<TransactionEntry>>> getAllByUser(
@@ -25,12 +26,12 @@ public class TransactionController extends BaseController<Long, TransactionEntry
         return service.getAllByUser(page, size);
     }
 
-    @GetMapping("/getAll/label/{labelId}")
+    @GetMapping("/getAll/label/{labelUuid}")
     public ResponseEntity<BaseResponse<List<TransactionEntry>>> getAllByLabel(
-            @PathVariable Long labelId,
+            @PathVariable UUID labelUuid,
             @RequestParam(defaultValue = "0") long page,
             @RequestParam(defaultValue = "10") long size) {
-        return service.getAllByLabel(labelId, page, size);
+        return service.getAllByLabel(labelUuid, page, size);
     }
 
 }

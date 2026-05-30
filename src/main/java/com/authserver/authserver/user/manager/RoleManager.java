@@ -1,5 +1,7 @@
 package com.authserver.authserver.user.manager;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Component;
 
 import com.authserver.authserver.base.BaseManager;
@@ -12,7 +14,7 @@ import lombok.Setter;
 
 @Setter(onMethod = @__({ @Autowired }))
 @Component
-public class RoleManager extends BaseManager<Long, RoleEntry, RoleModel, RoleRepository> {
+public class RoleManager extends BaseManager<UUID, RoleEntry, RoleModel, RoleRepository> {
 
     private final ConvertorInterface<RoleEntry, RoleModel> roleConvertor;
 

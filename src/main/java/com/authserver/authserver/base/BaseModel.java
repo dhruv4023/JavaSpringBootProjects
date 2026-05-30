@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @MappedSuperclass
 @Getter
@@ -20,8 +21,8 @@ import java.time.Instant;
 public abstract class BaseModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID uuid;
 
     @Column(name = "created_at", updatable = false, nullable = false)
     private Instant createdAt;
@@ -29,8 +30,8 @@ public abstract class BaseModel {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    public BaseModel(Long id) {
-        this.id = id;
+    public BaseModel(UUID uuid) {
+        this.uuid = uuid;
     }
 
     @PrePersist

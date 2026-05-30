@@ -34,13 +34,14 @@ public class TransactionConvertor implements ConvertorInterface<TransactionEntry
             transaction.setDate(entry.getDate());
         }
         if (Objects.nonNull(entry.getLabel())) {
-            LabelModel label = labelRepository.findById(entry.getLabel().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Label not found with id " + entry.getLabel().getId()));
+            LabelModel label = labelRepository.findById(entry.getLabel().getUuid())
+                    .orElseThrow(
+                            () -> new EntityNotFoundException("Label not found with id " + entry.getLabel().getUuid()));
             transaction.setLabel(label);
         }
-        if (Objects.nonNull(entry.getUserId())) {
+        if (Objects.nonNull(entry.getUserUuid())) {
             UserModel user = new UserModel();
-            user.setId(entry.getUserId());
+            user.setUuid(entry.getUserUuid());
             transaction.setUser(user);
         }
         return transaction;
@@ -49,12 +50,14 @@ public class TransactionConvertor implements ConvertorInterface<TransactionEntry
     @Override
     public TransactionEntry toEntry(TransactionModel model) {
         TransactionEntry entry = new TransactionEntry();
-        entry.setId(model.getId());
+        entry.setUuid(model.getUuid());
         entry.setComment(model.getComment());
         entry.setAmt(model.getAmt());
         entry.setDate(model.getDate());
-        entry.setLabel(new LabelEntry(model.getLabel().getId(), model.getLabel().getLabelName()));
-        entry.setUserId(model.getUser() != null ? model.getUser().getId() : null);
+        if (model.getLabel() != null) {
+            entry.setLabel(new LabelEntry(model.getLabel().getUuid(), model.getLabel().getLabelName()));
+        }
+        entry.setUserUuid(model.getUser() != null ? model.getUser().getUuid() : null);
         return entry;
     }
 

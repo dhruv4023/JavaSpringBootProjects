@@ -1,5 +1,6 @@
 package com.authserver.authserver.user.entry;
 
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class UserEntry {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long id;
+    private UUID uuid;
 
     private String username;
 

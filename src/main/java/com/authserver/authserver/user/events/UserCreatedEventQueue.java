@@ -25,7 +25,7 @@ public class UserCreatedEventQueue extends ScheduledQueueHandler {
     @Override
     protected void send(EventQueueEntry events) throws Exception {
         ProducerEmailEvent payload = objectMapper.readValue(events.getPayload(), ProducerEmailEvent.class);
-        payload.setSenderId(events.getSenderId());
+        payload.setSenderUuid(events.getSenderUuid());
         userEventPublisher.publishUserCreated(payload);
     }
 }

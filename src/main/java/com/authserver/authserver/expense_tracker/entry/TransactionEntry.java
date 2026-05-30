@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +15,7 @@ import java.time.Instant;
 public class TransactionEntry {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long id;
+    private UUID uuid;
 
     private String comment;
 
@@ -25,6 +26,6 @@ public class TransactionEntry {
     private Instant date;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long userId;
+    private UUID userUuid;
 
 }

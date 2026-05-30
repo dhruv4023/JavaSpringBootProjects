@@ -1,6 +1,7 @@
 package com.authserver.authserver.expense_tracker.controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,7 @@ import com.authserver.authserver.expense_tracker.services.LabelService;
 
 @RestController
 @RequestMapping("/expense-tracker/label")
-public class LabelController extends BaseController<Long, LabelEntry, LabelService> {
+public class LabelController extends BaseController<UUID, LabelEntry, LabelService> {
 
     @GetMapping("/getAll/user")
     public ResponseEntity<BaseResponse<List<LabelEntry>>> getAllByUser(

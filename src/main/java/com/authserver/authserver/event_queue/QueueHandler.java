@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -93,8 +94,8 @@ public abstract class QueueHandler implements QueueHandlerInterface {
 
     @Override
     public boolean addToQueue(EventQueueEntry entry) {
-        UserModel user = Objects.nonNull(entry.getSenderId())
-                ? userManager.findUserModelByID(entry.getSenderId())
+        UserModel user = Objects.nonNull(entry.getSenderUuid())
+                ? userManager.findUserModelByID(entry.getSenderUuid())
                 : null;
 
         EventQueue event = EventQueue.builder()
@@ -172,13 +173,14 @@ public abstract class QueueHandler implements QueueHandlerInterface {
 
         List<BulkResult> results = sendBulk(entries);
 
-        Map<Long, EventQueue> eventMap = events.stream()
-                .collect(Collectors.toMap(EventQueue::getId, e -> e));
+        Map<UUID, EventQueue> eventMap = events.stream()
+                .collect(Collectors.toMap(EventQueue::getUuid, e -> e));
 
         for (BulkResult result : results) {
-            EventQueue event = eventMap.get(result.getEventId());
-            if (Objects.nonNull(event))
+            EventQueue event = eventMap.get(result.getEventUuid());
+            if (Objects.nonNull(event)) {
                 handleAfterSendOrFailure(event, result.getError());
+            }
         }
     }
 
@@ -282,7 +284,7 @@ public abstract class QueueHandler implements QueueHandlerInterface {
 
     private EventQueueEntry toEntry(EventQueue entity) {
         return EventQueueEntry.builder()
-                .id(entity.getId())
+                .uuid(entity.getUuid())
                 .eventType(entity.getEventType())
                 .status(entity.getStatus())
                 .payload(entity.getPayload())

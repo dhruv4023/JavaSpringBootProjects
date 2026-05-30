@@ -1,5 +1,7 @@
 package com.authserver.authserver.user.models;
 
+import java.util.UUID;
+
 import com.authserver.authserver.base.BaseModel;
 
 import jakarta.persistence.*;
@@ -12,8 +14,8 @@ import lombok.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 public class UserModel extends BaseModel {
-    public UserModel(Long id) {
-        super(id);
+    public UserModel(UUID uuid) {
+        super(uuid);
     }
 
     @Column(nullable = false, unique = true)
@@ -26,7 +28,7 @@ public class UserModel extends BaseModel {
     private String email;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_uuid", nullable = false)
     private RoleModel role;
 
 }

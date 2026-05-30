@@ -21,6 +21,6 @@ public class EmailCredentials extends BaseModel {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_uuid", nullable = false)
     private UserModel user;
 }

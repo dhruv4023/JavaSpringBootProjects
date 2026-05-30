@@ -1,6 +1,7 @@
 package com.authserver.authserver.expense_tracker.entry;
 
 import java.util.List;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,7 @@ public class MonthlyAnalysisResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CategoryBreakdown {
-        private Long labelId;
+        private UUID labelUuid;
         private String labelName;
         private Double total;
     }

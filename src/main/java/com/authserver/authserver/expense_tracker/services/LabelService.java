@@ -1,6 +1,7 @@
 package com.authserver.authserver.expense_tracker.services;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import com.authserver.authserver.expense_tracker.entry.LabelEntry;
 import com.authserver.authserver.expense_tracker.manager.LabelManager;
 
 @Service
-public class LabelService extends BaseService<Long, LabelEntry, LabelManager> {
+public class LabelService extends BaseService<UUID, LabelEntry, LabelManager> {
 
     public LabelService(LabelManager manager) {
         super(manager);

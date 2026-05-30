@@ -23,7 +23,7 @@ public class EmailConsumer {
         System.out.println("Sending email to: " + event.getToEmail());
 
         try {
-            emailUtil.sendEmail(event.getToEmail(), event.getSubject(), event.getBody(), event.getSenderId(),
+            emailUtil.sendEmail(event.getToEmail(), event.getSubject(), event.getBody(), event.getSenderUuid(),
                     event.getAttachmentBytes(), event.getAttachmentFileName());
         } catch (Exception e) {
             log.error("Email sending failed", e);

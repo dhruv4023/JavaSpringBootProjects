@@ -2,6 +2,7 @@ package com.authserver.authserver.event_queue.repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,19 +14,19 @@ import com.authserver.authserver.event_queue.models.EventQueue;
 import com.authserver.authserver.user.models.UserModel;
 
 @Repository
-public interface EventQueueRepository extends BaseRepository<EventQueue, Long> {
+public interface EventQueueRepository extends BaseRepository<EventQueue, UUID> {
 
        @Query(value = """
                      SELECT *
                      FROM (
                          SELECT *,
-                                ROW_NUMBER() OVER (PARTITION BY sender_id ORDER BY id) as rn
+                                ROW_NUMBER() OVER (PARTITION BY sender_uuid ORDER BY uuid) as rn
                          FROM event_queue
                          WHERE event_type = :eventType
                            AND next_retry_after < UTC_TIMESTAMP()
                      ) t
                      WHERE rn = 1
-                     ORDER BY id
+                     ORDER BY uuid
                      """, nativeQuery = true)
        Page<EventQueue> fetchBatchDistinctSender(
                      @Param("eventType") String eventType,

@@ -21,14 +21,14 @@ public class LabelConvertor implements ConvertorInterface<LabelEntry, LabelModel
         if (Objects.nonNull(entry.getDefaultLabel())) {
             label.setDefaultLabel(entry.getDefaultLabel());
         }
-        if (Objects.nonNull(entry.getParentId())) {
+        if (Objects.nonNull(entry.getParentUuid())) {
             LabelModel parent = new LabelModel();
-            parent.setId(entry.getParentId());
+            parent.setUuid(entry.getParentUuid());
             label.setParent(parent);
         }
-        if (Objects.nonNull(entry.getUserId())) {
+        if (Objects.nonNull(entry.getUserUuid())) {
             UserModel user = new UserModel();
-            user.setId(entry.getUserId());
+            user.setUuid(entry.getUserUuid());
             label.setUser(user);
         }
         return label;
@@ -37,11 +37,11 @@ public class LabelConvertor implements ConvertorInterface<LabelEntry, LabelModel
     @Override
     public LabelEntry toEntry(LabelModel model) {
         LabelEntry entry = new LabelEntry();
-        entry.setId(model.getId());
+        entry.setUuid(model.getUuid());
         entry.setLabelName(model.getLabelName());
         entry.setDefaultLabel(model.getDefaultLabel());
-        entry.setParentId(model.getParent() != null ? model.getParent().getId() : null);
-        entry.setUserId(model.getUser() != null ? model.getUser().getId() : null);
+        entry.setParentUuid(model.getParent() != null ? model.getParent().getUuid() : null);
+        entry.setUserUuid(model.getUser() != null ? model.getUser().getUuid() : null);
         return entry;
     }
 

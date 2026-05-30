@@ -1,5 +1,7 @@
 package com.authserver.authserver.communication.entry;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TemplateEntry {
-    private Long id;
+    private UUID uuid;
     private String name;
     private String title;
     private String content;
-    private Long userId;
+    private UUID userUuid;
 }

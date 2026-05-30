@@ -1,5 +1,7 @@
 package com.authserver.authserver.event_queue.entry;
 
+import java.util.UUID;
+
 import com.authserver.authserver.event_queue.QueueStatus;
 
 import lombok.*;
@@ -9,7 +11,7 @@ import lombok.*;
 @Builder
 public class EventQueueEntry {
 
-    private final Long id;
+    private final UUID uuid;
     private final String eventType;
     private final QueueStatus status;
     private final Integer retryCount;
@@ -18,17 +20,17 @@ public class EventQueueEntry {
     private String error;
 
     @Setter
-    private Long senderId;
+    private UUID senderUuid;
 
     @Setter
     private String payload;
 
-    public EventQueueEntry(Long senderId, String payload) {
-        this.id = null;
+    public EventQueueEntry(UUID senderUuid, String payload) {
+        this.uuid = null;
         this.eventType = null;
         this.status = null;
         this.retryCount = null;
-        this.senderId = senderId;
+        this.senderUuid = senderUuid;
         this.payload = payload;
     }
 }

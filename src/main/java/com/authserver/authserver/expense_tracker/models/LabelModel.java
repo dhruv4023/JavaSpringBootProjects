@@ -25,10 +25,10 @@ public class LabelModel extends BaseModel {
     private Boolean defaultLabel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_uuid")
     private UserModel user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "parent_uuid")
     private LabelModel parent;
 }

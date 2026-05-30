@@ -1,12 +1,14 @@
 package com.authserver.authserver.user.services;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import com.authserver.authserver.base.service.BaseService;
 import com.authserver.authserver.user.entry.UserEntry;
 import com.authserver.authserver.user.manager.UserManager;
 
 @Service
-public class UserService extends BaseService<Long, UserEntry, UserManager> {
+public class UserService extends BaseService<UUID, UserEntry, UserManager> {
 
     public UserService(UserManager manager) {
         super(manager);

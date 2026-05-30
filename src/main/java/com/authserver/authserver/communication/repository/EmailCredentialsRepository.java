@@ -1,11 +1,13 @@
 package com.authserver.authserver.communication.repository;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Repository;
 
 import com.authserver.authserver.base.BaseRepository;
 import com.authserver.authserver.communication.models.EmailCredentials;
 
 @Repository
-public interface EmailCredentialsRepository extends BaseRepository<EmailCredentials, Long>  {
+public interface EmailCredentialsRepository extends BaseRepository<EmailCredentials, UUID>  {
 
 }

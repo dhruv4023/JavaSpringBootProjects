@@ -86,6 +86,6 @@ public abstract class BaseManager<ID, Entry, Entity, Repo extends BaseRepository
     }
 
     protected Sort getSort() {
-        return Sort.by("id").descending();
+        return Sort.by("uuid").descending();
     }
 }

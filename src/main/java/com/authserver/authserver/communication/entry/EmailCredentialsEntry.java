@@ -1,5 +1,7 @@
 package com.authserver.authserver.communication.entry;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmailCredentialsEntry {
     private String passcode;
-    private Long userId;
+    private UUID userUuid;
 }

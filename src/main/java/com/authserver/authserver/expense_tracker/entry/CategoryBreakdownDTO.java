@@ -1,7 +1,9 @@
 package com.authserver.authserver.expense_tracker.entry;
 
+import java.util.UUID;
+
 public interface CategoryBreakdownDTO {
-    Long getLabelId();
+    UUID getLabelUuid();
     String getLabelName();
     Double getTotal();
 }

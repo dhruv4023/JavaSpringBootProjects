@@ -1,6 +1,7 @@
 package com.authserver.authserver.expense_tracker.manager;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +18,7 @@ import com.authserver.authserver.expense_tracker.repositories.TransactionReposit
 import com.authserver.authserver.user.util.SecurityUtils;
 
 @Component("expenseTransactionManager")
-public class TransactionManager extends BaseManager<Long, TransactionEntry, TransactionModel, TransactionRepository> {
+public class TransactionManager extends BaseManager<UUID, TransactionEntry, TransactionModel, TransactionRepository> {
 
     private final ConvertorInterface<TransactionEntry, TransactionModel> transactionConvertor;
 
@@ -32,9 +33,9 @@ public class TransactionManager extends BaseManager<Long, TransactionEntry, Tran
 
     @Override
     protected TransactionModel toEntity(TransactionEntry entry, TransactionModel existing) {
-        Long userId = securityutil.getCurrentUserId();
+        UUID userId = securityutil.getCurrentUserUuid();
         if (Objects.nonNull(userId)) {
-            entry.setUserId(userId);
+            entry.setUserUuid(userId);
         }
         return transactionConvertor.toModel(entry, existing);
     }
@@ -44,12 +45,12 @@ public class TransactionManager extends BaseManager<Long, TransactionEntry, Tran
         return transactionConvertor.toEntry(entity);
     }
 
-    public Page<TransactionEntry> getByUserIdAndLabelId(Long labelId, long page, long size) {
+    public Page<TransactionEntry> getByUserIdAndLabelId(UUID labelUuid, long page, long size) {
         Sort sort = getSort();
         Objects.requireNonNull(sort, "Sort must not be null");
         Pageable pageable = PageRequest.of((int) page, (int) size, sort);
-        Long userId = securityutil.getCurrentUserId();
-        Page<TransactionModel> entityPage = repository.findByUserIdAndLabelId(userId, labelId, pageable);
+        UUID userId = securityutil.getCurrentUserUuid();
+        Page<TransactionModel> entityPage = repository.findByUserUuidAndLabelUuid(userId, labelUuid, pageable);
         return entityPage.map(this::toEntry);
     }
 
@@ -60,6 +61,6 @@ public class TransactionManager extends BaseManager<Long, TransactionEntry, Tran
 
     @Override
     protected Specification<TransactionModel> buildSpecification(String search) {
-        return (root, query, cb) -> cb.equal(root.get("user").get("id"), securityutil.getCurrentUserId());
+        return (root, query, cb) -> cb.equal(root.get("user").get("uuid"), securityutil.getCurrentUserUuid());
     }
 }

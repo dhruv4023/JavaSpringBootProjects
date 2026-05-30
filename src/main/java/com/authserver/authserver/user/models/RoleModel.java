@@ -27,6 +27,6 @@ public class RoleModel extends BaseModel {
     private String description;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "role_access_rights", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "access_rights_id"))
+    @JoinTable(name = "role_access_rights", joinColumns = @JoinColumn(name = "role_uuid"), inverseJoinColumns = @JoinColumn(name = "access_rights_uuid"))
     private Set<AccessRights> accessRights = new HashSet<>();
 }

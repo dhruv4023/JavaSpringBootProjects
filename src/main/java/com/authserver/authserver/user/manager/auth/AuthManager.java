@@ -66,9 +66,9 @@ public class AuthManager implements AuthManagerInterface {
         UserEntry userEntry = userManager.findByUsername(loginEntry.getUsername());
         UserModel user = userManager.findUserModelByUsername(loginEntry.getUsername());
         if (passwordEncoder.matches(loginEntry.getPassword(), user.getPassword())) {
-            String token = jwtUtil.generateToken(user.getId(), loginEntry.getUsername(),
+            String token = jwtUtil.generateToken(user.getUuid(), loginEntry.getUsername(),
                     user.getRole().getRoleName());
-            
+
             RefreshTokenModel refreshTokenModel = refreshTokenManager.createRefreshToken(user);
 
             session.setAttribute("user", loginEntry.getUsername());
@@ -186,12 +186,12 @@ public class AuthManager implements AuthManagerInterface {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername(),
+        String token = jwtUtil.generateToken(user.getUuid(), user.getUsername(),
                 user.getRoleEntry().getRoleName());
-        
+
         UserModel userModel = userManager.findUserModelByUsername(user.getUsername());
         RefreshTokenModel refreshTokenModel = refreshTokenManager.createRefreshToken(userModel);
-        
+
         session.setAttribute("user", user.getUsername());
         return new AuthResponse(user, token, refreshTokenModel.getToken());
     }
@@ -200,13 +200,13 @@ public class AuthManager implements AuthManagerInterface {
     public AuthResponse refreshToken(TokenRefreshRequest request) {
         RefreshTokenModel refreshTokenModel = refreshTokenManager.findByToken(request.getRefreshToken());
         refreshTokenManager.verifyExpiration(refreshTokenModel);
-        
+
         UserModel user = refreshTokenModel.getUser();
         UserEntry userEntry = userManager.findByUsername(user.getUsername());
-        
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername(),
+
+        String token = jwtUtil.generateToken(user.getUuid(), user.getUsername(),
                 user.getRole().getRoleName());
-        
+
         return new AuthResponse(userEntry, token, refreshTokenModel.getToken());
     }
 }

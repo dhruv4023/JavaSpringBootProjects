@@ -9,8 +9,8 @@ import com.authserver.authserver.user.entry.RoleEntry;
 import com.authserver.authserver.user.models.RoleModel;
 
 @Component
-public class RoleConvertor implements ConvertorInterface<RoleEntry, RoleModel>{
-    
+public class RoleConvertor implements ConvertorInterface<RoleEntry, RoleModel> {
+
     @Override
     public RoleModel toModel(RoleEntry entry, RoleModel existing) {
         RoleModel role = existing != null ? existing : new RoleModel();
@@ -25,6 +25,6 @@ public class RoleConvertor implements ConvertorInterface<RoleEntry, RoleModel>{
 
     @Override
     public RoleEntry toEntry(RoleModel entity) {
-        return new RoleEntry(entity.getId(), entity.getRoleName(), entity.getDescription());
+        return new RoleEntry(entity.getUuid(), entity.getRoleName(), entity.getDescription());
     }
 }

@@ -1,5 +1,7 @@
 package com.authserver.authserver.expense_tracker.entry;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
@@ -12,20 +14,20 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LabelEntry {
 
-    private Long id;
+    private UUID uuid;
 
     private String labelName;
 
     private Boolean defaultLabel;
 
-    private Long parentId;
+    private UUID parentUuid;
 
-    private Long userId;
+    private UUID userUuid;
 
     private Integer subCategoryCount;
 
-    public LabelEntry(Long id, String labelName) {
-        this.id = id;
+    public LabelEntry(UUID uuid, String labelName) {
+        this.uuid = uuid;
         this.labelName = labelName;
     }
 }

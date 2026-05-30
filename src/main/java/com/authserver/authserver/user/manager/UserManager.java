@@ -1,6 +1,7 @@
 package com.authserver.authserver.user.manager;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import com.authserver.authserver.user.repositories.UserRepository;
 import com.authserver.authserver.user.util.RandomPassword;
 
 @Component
-public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRepository> {
+public class UserManager extends BaseManager<UUID, UserEntry, UserModel, UserRepository> {
 
     private final PasswordEncoder passwordEncoder;
 
@@ -65,9 +66,9 @@ public class UserManager extends BaseManager<Long, UserEntry, UserModel, UserRep
         return repository.save(userModel);
     }
 
-    public UserModel findUserModelByID(Long userId) {
-        Objects.requireNonNull(userId, "User id cannot be null");
-        return repository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public UserModel findUserModelByID(UUID userUuid) {
+        Objects.requireNonNull(userUuid, "User id cannot be null");
+        return repository.findById(userUuid).orElseThrow(UserNotFoundException::new);
     }
 
     public String save(UserModel user) {

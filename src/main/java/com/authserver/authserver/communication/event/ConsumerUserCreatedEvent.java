@@ -1,12 +1,14 @@
 package com.authserver.authserver.communication.event;
 
+import java.util.UUID;
+
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class ConsumerUserCreatedEvent {
-    private Long senderId;
+    private UUID senderUuid;
     private String toEmail;
     private String subject;
     private String body;

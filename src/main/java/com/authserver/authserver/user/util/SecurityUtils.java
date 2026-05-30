@@ -1,5 +1,7 @@
 package com.authserver.authserver.user.util;
 
+import java.util.UUID;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,17 +21,17 @@ public class SecurityUtils {
         return authentication.getName();
     }
 
-    public Long getCurrentUserId() {
+    public UUID getCurrentUserUuid() {
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
 
-                if (authentication == null || !authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated()) {
             return null;
         }
 
         AuthUserDetails userDetails = (AuthUserDetails) authentication.getPrincipal();
 
-        return userDetails.getUserId();
+        return userDetails.getUserUuid();
     }
 }

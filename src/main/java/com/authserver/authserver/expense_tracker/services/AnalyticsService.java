@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
@@ -30,14 +31,14 @@ public class AnalyticsService {
     }
 
     public ResponseEntity<BaseResponse<MonthlyAnalysisResponse>> getMonthlyAnalysis(YearMonth yearMonth) {
-        Long userId = securityUtils.getCurrentUserId();
+        UUID userUuid = securityUtils.getCurrentUserUuid();
 
         Instant start = yearMonth.atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
         Instant end   = yearMonth.plusMonths(1).atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
         int daysInMonth = yearMonth.lengthOfMonth();
 
         // --- Summary ---
-        MonthlySummaryDTO summaryDTO = analyticsRepository.getMonthlySummary(userId, start, end);
+        MonthlySummaryDTO summaryDTO = analyticsRepository.getMonthlySummary(userUuid, start, end);
         double totalExpense     = summaryDTO.getTotalExpense() != null ? summaryDTO.getTotalExpense() : 0.0;
         long   transactionCount = summaryDTO.getTransactionCount() != null ? summaryDTO.getTransactionCount() : 0L;
         double avgDailyExpense  = daysInMonth > 0 ? totalExpense / daysInMonth : 0.0;
@@ -46,14 +47,14 @@ public class AnalyticsService {
                 totalExpense, transactionCount, avgDailyExpense);
 
         // --- Category breakdown ---
-        List<CategoryBreakdownDTO> categoryDTOs = analyticsRepository.getCategoryBreakdown(userId, start, end);
+        List<CategoryBreakdownDTO> categoryDTOs = analyticsRepository.getCategoryBreakdown(userUuid, start, end);
         List<MonthlyAnalysisResponse.CategoryBreakdown> categoryBreakdown = categoryDTOs.stream()
                 .map(dto -> new MonthlyAnalysisResponse.CategoryBreakdown(
-                        dto.getLabelId(), dto.getLabelName(), dto.getTotal()))
+                        dto.getLabelUuid(), dto.getLabelName(), dto.getTotal()))
                 .collect(Collectors.toList());
 
         // --- Daily trend ---
-        List<DailyTrendDTO> dailyDTOs = analyticsRepository.getDailyTrend(userId, start, end);
+        List<DailyTrendDTO> dailyDTOs = analyticsRepository.getDailyTrend(userUuid, start, end);
         List<MonthlyAnalysisResponse.DailyTrend> dailyTrend = dailyDTOs.stream()
                 .map(dto -> new MonthlyAnalysisResponse.DailyTrend(
                         dto.getDate().toString(), dto.getTotal()))

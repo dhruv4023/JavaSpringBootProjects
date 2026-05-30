@@ -2,6 +2,7 @@ package com.authserver.authserver.expense_tracker.manager;
 
 import com.authserver.authserver.expense_tracker.repositories.TransactionRepository;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 
 @Component
-public class LabelManager extends BaseManager<Long, LabelEntry, LabelModel, LabelRepository> {
+public class LabelManager extends BaseManager<UUID, LabelEntry, LabelModel, LabelRepository> {
 
     @Override
     @Transactional
@@ -33,7 +34,7 @@ public class LabelManager extends BaseManager<Long, LabelEntry, LabelModel, Labe
             return true;
         }
 
-        LabelModel parent = repository.findById(entity.getParent().getId())
+        LabelModel parent = repository.findById(entity.getParent().getUuid())
                 .orElseThrow(() -> new RuntimeException("Parent label not found"));
         if (parent.getParent() != null) {
             throw new RuntimeException(
@@ -48,17 +49,17 @@ public class LabelManager extends BaseManager<Long, LabelEntry, LabelModel, Labe
     @Override
     protected Boolean validateUpdateEntry(LabelEntry newEntry,
             LabelEntry existing) {
-        if (newEntry.getParentId() == null) {
+        if (newEntry.getParentUuid() == null) {
             handleDefaultLabel(toEntity(newEntry, null));
             return true;
         }
 
-        LabelEntry parent = getById(newEntry.getParentId());
-        if (parent.getId().equals(existing.getId())) {
+        LabelEntry parent = getById(newEntry.getParentUuid());
+        if (parent.getUuid().equals(existing.getUuid())) {
             throw new RuntimeException("Label cannot be parent of itself");
         }
 
-        if (parent.getParentId() != null) {
+        if (parent.getParentUuid() != null) {
             throw new RuntimeException(
                     "Maximum 2 levels of labels allowed");
         }
@@ -80,9 +81,9 @@ public class LabelManager extends BaseManager<Long, LabelEntry, LabelModel, Labe
 
     @Override
     protected LabelModel toEntity(LabelEntry entry, LabelModel existing) {
-        Long userId = securityutil.getCurrentUserId();
-        if (Objects.nonNull(userId)) {
-            entry.setUserId(userId);
+        UUID userUuid = securityutil.getCurrentUserUuid();
+        if (Objects.nonNull(userUuid)) {
+            entry.setUserUuid(userUuid);
         }
         return labelConvertor.toModel(entry, existing);
     }
@@ -93,18 +94,18 @@ public class LabelManager extends BaseManager<Long, LabelEntry, LabelModel, Labe
     }
 
     @Override
-    public void delete(Long id) throws ResourceNotFoundException {
-        LabelEntry entry = getById(id);
+    public void delete(UUID uuid) throws ResourceNotFoundException {
+        LabelEntry entry = getById(uuid);
         if (entry.getDefaultLabel()) {
             throw new LabelDeleteException("default label");
         }
-        if (repository.existsByParentId(id)) {
+        if (repository.existsByParentUuid(uuid)) {
             throw new LabelDeleteException("sub labels");
         }
-        if (transactionRepository.existsByLabelId(id)) {
+        if (transactionRepository.existsByUserUuidAndLabelUuid(securityutil.getCurrentUserUuid(), uuid)) {
             throw new LabelDeleteException("transactions");
         }
-        super.delete(id);
+        super.delete(uuid);
     }
 
     @Transactional
@@ -114,9 +115,9 @@ public class LabelManager extends BaseManager<Long, LabelEntry, LabelModel, Labe
             return;
         }
 
-        repository.findByDefaultLabelTrueAndUserId(securityutil.getCurrentUserId())
+        repository.findByDefaultLabelTrueAndUserUuid(securityutil.getCurrentUserUuid())
                 .ifPresent(currentDefault -> {
-                    if (!currentDefault.getId().equals(label.getId())) {
+                    if (!currentDefault.getUuid().equals(label.getUuid())) {
                         currentDefault.setDefaultLabel(false);
                         repository.save(currentDefault);
                     }
@@ -126,7 +127,7 @@ public class LabelManager extends BaseManager<Long, LabelEntry, LabelModel, Labe
     @Override
     protected Specification<LabelModel> buildSpecification(String search) {
         return (root, query, cb) -> {
-            Predicate predicate = cb.equal(root.get("user").get("id"), securityutil.getCurrentUserId());
+            Predicate predicate = cb.equal(root.get("user").get("uuid"), securityutil.getCurrentUserUuid());
             if (search == null || search.trim().isEmpty()) {
                 return predicate;
             }
